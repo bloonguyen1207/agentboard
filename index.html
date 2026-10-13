@@ -1,0 +1,274 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Agentboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=JetBrains+Mono:wght@400&family=Silkscreen&display=swap">
+<style>
+/* Layout: a slim bar of tabs over one full-height view: the guide for a version in a frame, or What's new as a reading column */
+
+:root{
+  color-scheme:light;
+  --bg:#ECEFF2; --surface:#FFFFFF; --surface-2:#F4F6F8; --ink:#16202B; --muted:#586374; --line:#D3D9E1; --accent:#33475E; --focus:#2F6DB5; --ok:#226E41; --wait:#A27700;
+  --display:"Silkscreen", ui-monospace, monospace; --body:"Atkinson Hyperlegible", system-ui, -apple-system, sans-serif; --mono:"JetBrains Mono", ui-monospace, monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){ color-scheme:dark; --bg:#0E1318; --surface:#161D25; --surface-2:#1C252F; --ink:#E4E9EF; --muted:#99A6B7; --line:#2A3441; --accent:#B4C6DA; --focus:#78A9EE; --ok:#5FC98A; --wait:#E9BC3A; }
+}
+:root[data-theme="dark"]{ color-scheme:dark; --bg:#0E1318; --surface:#161D25; --surface-2:#1C252F; --ink:#E4E9EF; --muted:#99A6B7; --line:#2A3441; --accent:#B4C6DA; --focus:#78A9EE; --ok:#5FC98A; --wait:#E9BC3A; }
+*{ box-sizing:border-box; }
+html, body{ height:100%; }
+body{ margin:0; background:var(--bg); color:var(--ink); font-family:var(--body); display:flex; flex-direction:column; }
+[hidden]{ display:none !important; }
+a{ color:var(--accent); text-underline-offset:2px; }
+:focus-visible{ outline:2px solid var(--focus); outline-offset:2px; }
+code{ font-family:var(--mono); font-size:.85em; }
+.bar{ display:flex; flex-wrap:wrap; align-items:center; gap:8px 18px; padding:calc(10px + env(safe-area-inset-top,0px)) 16px 10px; border-bottom:1px solid var(--line); background:var(--surface); }
+.brand{ font-family:var(--display); font-size:1rem; letter-spacing:.03em; }
+.brand small{ font-size:.7rem; color:var(--muted); margin-left:6px; }
+.tabs{ display:flex; gap:4px; }
+.tab{ font:inherit; font-weight:700; font-size:.9rem; padding:6px 12px; border-radius:6px; border:1px solid transparent; background:none; color:var(--muted); cursor:pointer; }
+.tab[aria-selected="true"]{ color:var(--ink); border-color:var(--line); background:var(--bg); }
+select{ font:inherit; font-size:.86rem; padding:5px 8px; border-radius:6px; border:1px solid var(--line); background:var(--surface); color:var(--ink); }
+.pick{ display:flex; align-items:center; gap:6px; }
+.note{ color:var(--muted); font-size:.82rem; }
+.bar .note{ margin-left:auto; }
+.bar .made{ margin-left:auto; color:var(--muted); font-size:.82rem; }
+.get{ font-weight:700; font-size:.88rem; padding:6px 12px; border-radius:6px; background:var(--accent); color:var(--surface); text-decoration:none; white-space:nowrap; }
+.get:hover{ background:var(--ink); }
+@media (max-width:700px){ .bar .made{ display:none; } .get{ margin-left:auto; } }
+.older{ margin:0; padding:8px 16px; background:var(--surface-2); border-bottom:1px solid var(--line); font-size:.9rem; }
+main{ flex:1; min-height:0; display:flex; }
+.framewrap{ flex:1; display:flex; }
+iframe{ flex:1; border:0; width:100%; background:var(--bg); }
+.read{ flex:1; overflow:auto; padding:28px 16px calc(64px + env(safe-area-inset-bottom,0px)); }
+.col{ max-width:46rem; margin:0 auto; display:grid; gap:18px; }
+.col h2{ font-family:var(--display); font-weight:400; font-size:1.2rem; margin:0; }
+.col > p{ margin:0; color:var(--muted); line-height:1.55; }
+.entry{ background:var(--surface); border:1px solid var(--line); border-radius:10px; padding:14px 16px; display:grid; gap:8px; }
+.entry header{ display:flex; flex-wrap:wrap; align-items:baseline; gap:6px 12px; }
+.entry h3{ margin:0; font-size:1rem; }
+.entry .date{ margin-left:auto; }
+.entry ul{ margin:0; padding-left:1.1rem; display:grid; gap:5px; line-height:1.5; font-size:.94rem; }
+.entry p{ margin:0; line-height:1.55; font-size:.94rem; }
+.ver{ font-family:var(--display); font-size:.95rem; }
+.date{ color:var(--muted); font-size:.82rem; font-variant-numeric:tabular-nums; }
+.col .tw{ overflow-x:auto; }
+.col table{ border-collapse:collapse; width:100%; font-size:.9rem; background:var(--surface); border:1px solid var(--line); border-radius:8px; }
+.col th, .col td{ text-align:left; padding:7px 10px; border-top:1px solid var(--line); vertical-align:top; line-height:1.45; }
+.col thead th{ border-top:0; font-size:.78rem; color:var(--muted); }
+.guide{ background:var(--surface); border:1px solid var(--line); border-radius:10px; padding:16px 18px; display:grid; gap:10px; }
+.guide h3{ margin:0; font-family:var(--display); font-weight:400; font-size:1.05rem; }
+.guide h4{ margin:8px 0 0; font-size:1rem; }
+.guide p{ margin:0; line-height:1.55; font-size:.94rem; }
+.guide pre{ margin:0; padding:10px 12px; background:var(--bg); border:1px solid var(--line); border-radius:6px; overflow-x:auto; font-family:var(--mono); font-size:.82rem; line-height:1.5; }
+.guide table{ background:var(--bg); }
+
+.wn{ max-width:74rem; gap:30px; }
+/* the type of a change, and the kind of a release: new (and a feature release), improved, fixed (and a bug fix) */
+:root{ --t-new:#1C6B3A; --t-improved:#2A5DA3; --t-fixed:#8A5800; }
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){ --t-new:#5FC98A; --t-improved:#86B3F0; --t-fixed:#E9BC3A; } }
+:root[data-theme="dark"]{ --t-new:#5FC98A; --t-improved:#86B3F0; --t-fixed:#E9BC3A; }
+.t-new{ --c:var(--t-new); } .t-improved{ --c:var(--t-improved); } .t-fixed{ --c:var(--t-fixed); }
+.wn-head{ display:grid; gap:10px; }
+.wn-head h1{ margin:0; font-family:var(--display); font-weight:400; font-size:1.5rem; }
+.wn-head p{ margin:0; color:var(--muted); max-width:62ch; }
+/* every change, or one type's: the chips set data-show on the column, and what does not match steps out */
+.show{ display:flex; flex-wrap:wrap; gap:6px; }
+.show button{ font:inherit; font-size:.86rem; font-weight:700; display:inline-flex; align-items:center; gap:6px; padding:5px 12px; border-radius:999px; border:1px solid var(--line); background:var(--surface); color:var(--ink); cursor:pointer; }
+.show button[aria-pressed="true"]{ background:var(--ink); border-color:var(--ink); color:var(--surface); }
+.show i{ width:8px; height:8px; border-radius:50%; background:var(--c); }
+.wn[data-show="new"] [data-types]:not([data-types~="new"]), .wn[data-show="new"] [data-type]:not([data-type="new"]),
+.wn[data-show="improved"] [data-types]:not([data-types~="improved"]), .wn[data-show="improved"] [data-type]:not([data-type="improved"]),
+.wn[data-show="fixed"] [data-types]:not([data-types~="fixed"]), .wn[data-show="fixed"] [data-type]:not([data-type="fixed"]){ display:none; }
+.minor{ display:grid; gap:16px; scroll-margin-top:12px; }
+.minor > h2{ padding-bottom:8px; border-bottom:1px solid var(--line); }
+.rel{ display:grid; gap:14px; padding:16px; border:1px solid var(--line); border-radius:12px; background:var(--surface); scroll-margin-top:12px; }
+/* a release with nothing new is one or two lines */
+.rel.k-fix, .rel.k-improvement{ gap:8px; padding:12px 16px; }
+.rel > header{ display:flex; flex-wrap:wrap; align-items:center; gap:4px 10px; }
+.rel h3{ margin:0; font-size:1.1rem; }
+.rel .date{ margin-left:auto; }
+.kind, .tag{ display:inline-block; padding:3px 8px; border-radius:999px; font-size:.72rem; font-weight:700; letter-spacing:.05em; text-transform:uppercase; line-height:1.3; color:var(--c); background:color-mix(in srgb, var(--c) 12%, var(--surface)); }
+.tag{ margin-right:4px; vertical-align:1px; }
+.pic{ display:grid; gap:10px; }
+.grp{ display:grid; gap:4px; }
+.grp h4{ margin:0; display:flex; align-items:center; gap:7px; font-size:.75rem; letter-spacing:.07em; text-transform:uppercase; color:var(--c); }
+.grp h4::before{ content:""; width:8px; height:8px; border-radius:50%; background:var(--c); }
+.grp ul{ margin:0; padding-left:1.15rem; display:grid; gap:4px; font-size:.95rem; line-height:1.5; }
+.vis{ display:grid; gap:12px; justify-items:start; min-width:0; }
+.vis.pair{ grid-template-columns:repeat(2,minmax(0,1fr)); }
+.vis.pair.stacked{ grid-template-columns:minmax(0,1fr); }
+.vis figure{ margin:0; display:grid; gap:6px; justify-items:start; min-width:0; max-width:100%; }
+.vis figure.art{ width:100%; }
+.vis figcaption{ font-family:var(--display); font-size:.75rem; letter-spacing:.08em; text-transform:uppercase; color:var(--muted); }
+.vis img{ display:block; width:var(--w); max-width:100%; height:auto; }
+.vis img.px{ image-rendering:pixelated; border-radius:6px; }
+.vis img.shot{ border:1px solid var(--line); border-radius:8px; }
+.vis img.icon{ width:128px; }
+/* a strip cropped to what changed: a whole multiple of the art, from 2x up to the scale it was drawn at, as large as
+   the column allows; a narrow column scrolls it sideways rather than shrinking it */
+.pxbox{ width:100%; overflow-x:auto; line-height:0; }
+.pxbox picture{ display:block; }
+.pxbox img.px{ max-width:none; width:calc(var(--aw) * 2px); }
+@supports (width: round(down, 100cqw, 1px)){
+  .pxbox{ container-type:inline-size; }
+  .pxbox img.px{ width:clamp(calc(var(--aw) * 2px), round(down, 100cqw, calc(var(--aw) * 1px)), calc(var(--aw) * var(--mx) * 1px)); }
+}
+.cap{ margin:0; font-size:1rem; line-height:1.5; }
+.before-app{ border:1px solid var(--line); border-radius:12px; background:var(--surface); scroll-margin-top:12px; }
+.before-app > summary{ cursor:pointer; list-style:none; display:flex; flex-wrap:wrap; align-items:baseline; gap:4px 12px; padding:14px 16px; }
+.before-app > summary::-webkit-details-marker{ display:none; }
+/* the group opens: a chevron says so */
+.before-app > summary::before{ content:"▸"; display:inline-block; width:1em; font-size:1.1rem; line-height:1; color:var(--ink); transition:transform .15s; }
+.before-app[open] > summary::before{ transform:rotate(90deg); }
+.before-app .h{ font-family:var(--display); font-size:1.1rem; }
+.before-app .sub{ color:var(--muted); font-size:.86rem; }
+.lines{ list-style:none; margin:0; padding:0 16px 10px; display:grid; }
+.lines > li{ border-top:1px solid var(--line); scroll-margin-top:12px; padding:9px 0; font-size:.92rem; line-height:1.5; }
+.lines .ver{ margin-right:6px; }
+.lines .date{ margin-right:6px; }
+.lines .cap{ display:inline; font-size:.92rem; color:var(--muted); }
+@media (prefers-reduced-motion: reduce){ .before-app > summary::before{ transition:none; } }
+.foot{ font-size:.84rem; color:var(--muted); border-top:1px solid var(--line); padding-top:14px; }
+@media (max-width:760px){ .vis.pair{ grid-template-columns:1fr; } .rel .date{ margin-left:0; } }
+
+</style>
+</head>
+<body>
+<div class="bar">
+  <span class="brand">Agentboard</span>
+  <div class="tabs" role="tablist" aria-label="Documentation">
+    <button class="tab" role="tab" id="t-guide" aria-controls="p-guide" data-tab="guide">Guide</button>
+    <button class="tab" role="tab" id="t-whatsnew" aria-controls="p-whatsnew" data-tab="whatsnew">What’s new</button>
+  </div>
+  <label class="pick" id="vpick"><span class="note">Version</span><select id="version" aria-label="Guide version"><option value="2.7">2.7 · latest</option><option value="2.6">2.6</option><optgroup label="Earlier: release notes"><option value="notes:2.5">2.5</option><option value="notes:2.4">2.4</option><option value="notes:2.3">2.3</option><option value="notes:2.2">2.2</option><option value="notes:2.1">2.1</option><option value="notes:2.0">2.0</option></optgroup></select></label>
+  <span class="made">Every name in the examples is made up.</span>
+  <a class="get" href="https://github.com/bloonguyen1207/agentboard/releases/latest" target="_blank" rel="noopener">Download for Mac</a>
+</div>
+<p class="older" id="older" hidden>This is the guide for <span id="older-v"></span>. <a href="#guide/latest">The latest is 2.7 →</a></p>
+<main>
+  <div id="p-guide" class="framewrap" role="tabpanel" aria-labelledby="t-guide"><iframe id="frame" title="Agentboard guide"></iframe></div>
+  <div id="p-whatsnew" class="read" role="tabpanel" aria-labelledby="t-whatsnew" hidden>
+<div class="col wn" data-show="all">
+<header class="wn-head"><h1>What’s new</h1><p>Every release, newest first, its changes marked new, improved or fixed. A change you can see comes with a picture, drawn by that release’s own code.</p><div class="show" role="group" aria-label="Show changes"><button type="button" data-show="all" aria-pressed="true">All</button><button type="button" data-show="new" aria-pressed="false"><i class="t-new"></i>New</button><button type="button" data-show="improved" aria-pressed="false"><i class="t-improved"></i>Improved</button><button type="button" data-show="fixed" aria-pressed="false"><i class="t-fixed"></i>Fixed</button></div></header>
+<section class="minor" id="g2.7" data-minor="2.7" data-types="new improved fixed"><h2>2.7</h2><article class="rel k-feature" id="v2.7.0" data-types="new improved fixed"><header><span class="ver">2.7.0</span><h3>Rooms</h3><span class="kind t-new">Feature</span><span class="date">13 Oct 2026</span></header><div class="pic" data-type="new"><div class="vis pair stacked"><figure class="art"><figcaption>Before · 2.6.4</figcaption><div class="pxbox"><img class="px" src="img/whatsnew/2.7.0-before.png" width="512" height="100" style="--aw:256;--mx:4" loading="lazy" decoding="async" alt="Before, in 2.6.4: DOCS, which is on no board, sent FRONTEND one message and got a desk beside BACKEND and FRONTEND, as if it were on their board."></div></figure><figure class="art"><figcaption>After · 2.7.0</figcaption><div class="pxbox"><img class="px" src="img/whatsnew/2.7.0-after.png" width="512" height="100" style="--aw:256;--mx:4" loading="lazy" decoding="async" alt="After, in 2.7.0: BACKEND and FRONTEND keep their desks by the claims board. DOCS has no desk here and stands facing FRONTEND with a visitor badge; the DOCS door on the left leads to its own room. Each desk now has a small red phone."></div></figure></div><p class="cap"><span class="tag t-new">New</span> Rooms replace crews. Sessions visit other rooms as guests, by message or by desk phone.</p></div><div class="grp" data-type="new"><h4 class="t-new">New</h4><ul><li>Several boards per folder, joined only by <code>/agentboard</code> or Settings; plans show in a Plans tab.</li><li>A free look, Áo cờ, after Việt Nam&#x27;s flag, is the default and the app icon&#x27;s.</li></ul></div><div class="grp" data-type="improved"><h4 class="t-improved">Improved</h4><ul><li>In Needs you, Done replaces Dismiss for hand-backs and PRs, and tells their session to check.</li><li>Settings opens from the top bar; tick its session hooks again. The macOS notification is gone.</li></ul></div><div class="grp" data-type="fixed"><h4 class="t-fixed">Fixed</h4><ul><li>A workflow board kept its last run for good, all green even if it failed; now it says FAILED or STOPPED, and clears after ten minutes.</li></ul></div></article></section>
+<section class="minor" id="g2.6" data-minor="2.6" data-types="new improved fixed"><h2>2.6</h2><article class="rel k-fix" id="v2.6.4" data-types="fixed"><header><span class="ver">2.6.4</span><span class="kind t-fixed">Bug fix</span><span class="date">13 Oct 2026</span></header><div class="grp" data-type="fixed"><ul><li>A forked agent never showed on the strip; now it gets its bot beside its session from when it started.</li><li>A workflow&#x27;s agents left its board while working through a long step; now each stays there until it returns.</li><li>Hide on a restarted session hid only its first transcript; now Settings lists each one, and hiding the session hides them all.</li><li>A shade behind the strip read as a dirty band over light windows, and rounded corners cut off its floor; both are gone.</li><li>A lit screen&#x27;s middle line ran onto the monitor&#x27;s frame; now it stays on the screen.</li></ul></div></article><article class="rel k-fix" id="v2.6.3" data-types="fixed"><header><span class="ver">2.6.3</span><span class="kind t-fixed">Bug fix</span><span class="date">12 Oct 2026</span></header><div class="grp" data-type="fixed"><ul><li>Walking into a crew replayed its last few events, your prompts included, as if new; now only new events play.</li></ul></div></article><article class="rel k-fix" id="v2.6.2" data-types="fixed"><header><span class="ver">2.6.2</span><span class="kind t-fixed">Bug fix</span><span class="date">12 Oct 2026</span></header><div class="grp" data-type="fixed"><ul><li>The strip redrew 60 or 120 times a second even when nothing moved; now it draws 15 while moving and 4 when still, saving battery.</li></ul></div></article><article class="rel k-feature" id="v2.6.1" data-types="new fixed"><header><span class="ver">2.6.1</span><h3>Agents at work</h3><span class="kind t-new">Feature</span><span class="date">12 Oct 2026</span></header><div class="pic" data-type="new"><div class="vis pair stacked"><figure class="art"><figcaption>Before · 2.6.0</figcaption><div class="pxbox"><img class="px" src="img/whatsnew/2.6.1-before.png" width="328" height="100" style="--aw:164;--mx:4" loading="lazy" decoding="async" alt="Before, in 2.6.0: BACKEND runs a workflow with two pale helper bots beside it. FRONTEND has two background agents at work, yet stands alone."></div></figure><figure class="art"><figcaption>After · 2.6.1</figcaption><div class="pxbox"><img class="px" src="img/whatsnew/2.6.1-after.png" width="328" height="100" style="--aw:164;--mx:4" loading="lazy" decoding="async" alt="After, in 2.6.1: two dark bots with gold eyes stand beside FRONTEND, one for each background agent, while BACKEND&#x27;s workflow bots stay pale."></div></figure></div><p class="cap"><span class="tag t-new">New</span> Background agents get a bot of their own: dark, with gold eyes; workflow bots stay pale.</p></div><div class="grp" data-type="new"><h4 class="t-new">New</h4><ul><li>Hover a session to see its workflows, each with its phase, and its agents.</li><li>An agent that failed lies beside its session for a day.</li></ul></div><div class="grp" data-type="fixed"><h4 class="t-fixed">Fixed</h4><ul><li>A session&#x27;s background agents only popped up as they started, so it looked idle; now they stay beside it while they work.</li></ul></div></article><article class="rel k-feature" id="v2.6.0" data-types="new improved fixed"><header><span class="ver">2.6.0</span><h3>Every run on the board</h3><span class="kind t-new">Feature</span><span class="date">12 Oct 2026</span></header><div class="pic" data-type="new"><div class="vis pair stacked"><figure class="art"><figcaption>Before · 2.5.0</figcaption><div class="pxbox"><img class="px" src="img/whatsnew/2.6.0-before.png" width="372" height="100" style="--aw:186;--mx:3" loading="lazy" decoding="async" alt="Before, in 2.5.0: PAYMENTS works alone and runs two workflows, but one wide board titled WORKFLOW shows only the newest, with two agents under Build."></div></figure><figure class="art"><figcaption>After · 2.6.0</figcaption><div class="pxbox"><img class="px" src="img/whatsnew/2.6.0-after.png" width="372" height="100" style="--aw:186;--mx:3" loading="lazy" decoding="async" alt="After, in 2.6.0: a board for each workflow, FIXTURE-AUDIT and LEDGER-READS. FIXTURE-AUDIT was cut off: its Fix phase is red and its two agents lie under it."></div></figure></div><p class="cap"><span class="tag t-new">New</span> A session working alone gets a board per workflow; cut-off runs stay red, agents lying down.</p></div><div class="grp" data-type="improved"><h4 class="t-improved">Improved</h4><ul><li>Deletion warnings say nothing is deleted until your first Claude Code prompt after the date.</li></ul></div><div class="grp" data-type="fixed"><h4 class="t-fixed">Fixed</h4><ul><li>A workflow cut off partway, such as by a usage limit, looked finished; now the Workflows tab says where its agents stopped and why.</li><li>Merged PRs stayed in Needs you; now they clear once the merge queue marks them merged or closed, and each PR is listed once.</li><li>Prompts typed while a session was busy showed up late, and those with an image never did; now each shows when you sent it.</li><li>The strip could replay an answer you gave long ago, or a renamed session&#x27;s old events, as if new; now only recent ones play.</li></ul></div></article></section>
+<section class="minor" id="g2.5" data-minor="2.5" data-types="new fixed"><h2>2.5</h2><article class="rel k-feature" id="v2.5.0" data-types="new fixed"><header><span class="ver">2.5.0</span><h3>The wardrobe</h3><span class="kind t-new">Feature</span><span class="date">11 Oct 2026</span></header><div class="pic" data-type="new"><div class="vis pair"><figure><figcaption>Before · 2.4.0</figcaption><img class="shot" src="img/whatsnew/2.5.0-before.png" width="912" height="377" style="--w:912px" loading="lazy" decoding="async" alt="Before, in 2.4.0: Settings, Your character, with eight looks facing forward, mostly hoodie colours: Green hoodie, Headphones, Night shift, Plum, Lagoon, Oatmeal, Plum headphones and Beanie."></figure><figure><figcaption>After · 2.5.0</figcaption><img class="shot" src="img/whatsnew/2.5.0-after.png" width="912" height="377" style="--w:912px" loading="lazy" decoding="async" alt="After, in 2.5.0: ten looks with side-view faces, each with an info button: Green hoodie, Headphones, Beanie, Nón lá, Áo dài, Cà phê, Dao Đỏ, H&#x27;Mông Hoa, Thái Đen and Ê Đê."></figure></div><p class="cap"><span class="tag t-new">New</span> Ten looks to wear at the gate, each with its story; faces now in profile.</p></div><div class="grp" data-type="fixed"><h4 class="t-fixed">Fixed</h4><ul><li>Placeholders like <code>[Image #1]</code> in your prompts were taken for PRs, and session names for tickets; they no longer are.</li><li>Clicking the workflow board of a session working alone opened Decisions; now it opens Workflows, and hovering shows the run.</li></ul></div></article></section>
+<section class="minor" id="g2.4" data-minor="2.4" data-types="new improved fixed"><h2>2.4</h2><article class="rel k-feature" id="v2.4.0" data-types="new improved fixed"><header><span class="ver">2.4.0</span><h3>Watching a crew</h3><span class="kind t-new">Feature</span><span class="date">11 Oct 2026</span></header><div class="pic" data-type="improved"><div class="vis pair stacked"><figure class="art"><figcaption>Before · 2.3.0</figcaption><div class="pxbox"><img class="px" src="img/whatsnew/2.4.0-before.png" width="368" height="100" style="--aw:184;--mx:3" loading="lazy" decoding="async" alt="Before, in 2.3.0: three characters, FOR, ONBOARDING and ONBOARDIN-2. A session titled &#x27;Search index for v3&#x27; is named after the word &#x27;for&#x27;, and a restarted session gets a desk of its own."></div></figure><figure class="art"><figcaption>After · 2.4.0</figcaption><div class="pxbox"><img class="px" src="img/whatsnew/2.4.0-after.png" width="368" height="100" style="--aw:184;--mx:3" loading="lazy" decoding="async" alt="After, in 2.4.0: two characters, INDEX and ONBOARDING; the restarted session is one character, at work."></div></figure></div><p class="cap"><span class="tag t-improved">Improved</span> One character per session, at the same desk all day, named from its title&#x27;s key word.</p></div><div class="grp" data-type="new"><h4 class="t-new">New</h4><ul><li>Take a session off a crew with Leave in Settings, or <code>agentboard leave</code> inside it.</li></ul></div><div class="grp" data-type="improved"><h4 class="t-improved">Improved</h4><ul><li>Needs you lists each thing once, in the order the actions must happen.</li></ul></div><div class="grp" data-type="fixed"><h4 class="t-fixed">Fixed</h4><ul><li>Things a board&#x27;s sessions handed back to you vanished from Needs you whenever Agentboard restarted; now they stay until done.</li><li>Decisions logged with impossible times, such as hours ahead, showed out of order; now they&#x27;re placed by when they were written.</li></ul></div></article></section>
+<section class="minor" id="g2.3" data-minor="2.3" data-types="new improved fixed"><h2>2.3</h2><article class="rel k-feature" id="v2.3.0" data-types="new improved fixed"><header><span class="ver">2.3.0</span><h3>Crews you can read</h3><span class="kind t-new">Feature</span><span class="date">11 Oct 2026</span></header><div class="pic" data-type="new"><div class="vis pair stacked"><figure class="art"><figcaption>Before · 2.2.0</figcaption><div class="pxbox"><img class="px" src="img/whatsnew/2.3.0-before.png" width="324" height="100" style="--aw:162;--mx:4" loading="lazy" decoding="async" alt="Before, in 2.2.0: a TOKENS panel hangs over the claims board with a bar per session; the desks of BACKEND and FRONTEND have no bars."></div></figure><figure class="art"><figcaption>After · 2.3.0</figcaption><div class="pxbox"><img class="px" src="img/whatsnew/2.3.0-after.png" width="324" height="100" style="--aw:162;--mx:4" loading="lazy" decoding="async" alt="After, in 2.3.0: the panel is gone. A cyan bar over BACKEND&#x27;s desk shows its context just over half full, an orange one over FRONTEND&#x27;s shows it mostly full."></div></figure></div><p class="cap"><span class="tag t-new">New</span> A context bar over each desk replaces the token panel; hover it for today&#x27;s tokens.</p></div><div class="grp" data-type="new"><h4 class="t-new">New</h4><ul><li>Settings lists each crew with its members and board; crews can be renamed.</li></ul></div><div class="grp" data-type="improved"><h4 class="t-improved">Improved</h4><ul><li>Connect or disconnect the usage limits with a button in Settings.</li></ul></div><div class="grp" data-type="fixed"><h4 class="t-fixed">Fixed</h4><ul><li>A session telling another it &#x27;needs your review&#x27; showed a Needs you bubble, as if meant for you; now it shows an Ask bubble.</li><li>Walking into a crew could show its gate with no crates or count until something new arrived; now they show at once.</li></ul></div></article></section>
+<section class="minor" id="g2.2" data-minor="2.2" data-types="new improved fixed"><h2>2.2</h2><article class="rel k-feature" id="v2.2.0" data-types="new improved fixed"><header><span class="ver">2.2.0</span><h3>Free and Pro</h3><span class="kind t-new">Feature</span><span class="date">11 Oct 2026</span></header><div class="pic" data-type="new"><div class="vis pair stacked"><figure class="art"><figcaption>Before · 2.1.0</figcaption><div class="pxbox"><img class="px" src="img/whatsnew/2.2.0-before.png" width="486" height="100" style="--aw:243;--mx:3" loading="lazy" decoding="async" alt="Before, in 2.1.0: BACKEND is busy in Claude Code but sits at a dark screen, FRONTEND waits on you but looks idle, and YOU wears the green hoodie."></div></figure><figure class="art"><figcaption>After · 2.2.0</figcaption><div class="pxbox"><img class="px" src="img/whatsnew/2.2.0-after.png" width="486" height="100" style="--aw:243;--mx:3" loading="lazy" decoding="async" alt="After, in 2.2.0: BACKEND types at a lit screen, a question mark hangs over FRONTEND, and YOU wears headphones."></div></figure></div><p class="cap"><span class="tag t-new">New</span> See who is working and who waits on you, and pick your own look.</p></div><div class="grp" data-type="new"><h4 class="t-new">New</h4><ul><li>Needs you warns 7, 3 and 1 day before Claude Code deletes a session.</li><li>Pro, a one-time licence, adds every folder, all history, summaries, the usage clock, sounds and looks.</li><li>The free plan covers one folder and the last 7 days.</li></ul></div><div class="grp" data-type="improved"><h4 class="t-improved">Improved</h4><ul><li>A session renamed with <code>/rename</code> in Claude Code takes its new name on the strip.</li></ul></div><div class="grp" data-type="fixed"><h4 class="t-fixed">Fixed</h4><ul><li>PRs waiting to merge vanished from Needs you when the merge queue named their state in its own words; now they show.</li></ul></div></article></section>
+<section class="minor" id="g2.1" data-minor="2.1" data-types="new improved fixed"><h2>2.1</h2><article class="rel k-feature" id="v2.1.0" data-types="new improved fixed"><header><span class="ver">2.1.0</span><h3>Crews</h3><span class="kind t-new">Feature</span><span class="date">11 Oct 2026</span></header><div class="pic" data-type="new"><div class="vis pair stacked"><figure class="art"><figcaption>Before · 2.0.0</figcaption><div class="pxbox"><img class="px" src="img/whatsnew/2.1.0-before.png" width="568" height="100" style="--aw:284;--mx:3" loading="lazy" decoding="async" alt="Before, in 2.0.0: BACKEND, FRONTEND and DOCS all stand around one claims board, though DOCS works on its own."></div></figure><figure class="art"><figcaption>After · 2.1.0</figcaption><div class="pxbox"><img class="px" src="img/whatsnew/2.1.0-after.png" width="568" height="100" style="--aw:284;--mx:3" loading="lazy" decoding="async" alt="After, in 2.1.0: BACKEND and FRONTEND keep the strip and their board; DOCS has its own door on the left, beside WEB and INFRA."></div></figure></div><p class="cap"><span class="tag t-new">New</span> Sessions that work together share a strip; one working alone gets its own door.</p></div><div class="grp" data-type="new"><h4 class="t-new">New</h4><ul><li>Each crew has its own Conversation, Decisions and Needs you, so unrelated sessions no longer mix.</li><li>Several sessions without a board get an empty one; the panel offers to start it.</li></ul></div><div class="grp" data-type="improved"><h4 class="t-improved">Improved</h4><ul><li>Idle crews go under Earlier in the picker, with a door only when something waits there.</li></ul></div><div class="grp" data-type="fixed"><h4 class="t-fixed">Fixed</h4><ul><li>A strip opened before any workspace was added never showed one until reloaded; now it appears at once.</li></ul></div></article></section>
+<section class="minor" id="g2.0" data-minor="2.0" data-types="new improved fixed"><h2>2.0</h2><article class="rel k-feature" id="v2.0.0" data-types="new improved fixed"><header><span class="ver">2.0.0</span><h3>macOS app</h3><span class="kind t-new">Feature</span><span class="date">11 Oct 2026</span></header><div class="pic" data-type="new"><div class="vis"><figure><img class="px icon" src="img/whatsnew/2.0.0-after.png" width="256" height="256" style="--w:256px" loading="lazy" decoding="async" alt="The app icon: YOU in the green hoodie, standing on the floor, with a red count of what waits on you."></figure></div><p class="cap"><span class="tag t-new">New</span> Agentboard is a Mac app; its icon is you in the green hoodie, counting what waits.</p></div><div class="grp" data-type="new"><h4 class="t-new">New</h4><ul><li>Drag Agentboard to Applications; it runs on Apple silicon and lives in the menu bar.</li></ul></div><div class="grp" data-type="improved"><h4 class="t-improved">Improved</h4><ul><li>Everything comes inside the app, the command line too; link it onto your PATH.</li></ul></div><div class="grp" data-type="fixed"><h4 class="t-fixed">Fixed</h4><ul><li>A PR written like <code>web#12</code> was filed under the folder&#x27;s own repo; now it goes under <code>web</code>.</li></ul></div></article></section>
+<details class="before-app" id="g-before" data-types="new"><summary><span class="h">Before the app</span><span class="sub">0.1 to 1.4, before Agentboard was a Mac app</span></summary><ul class="lines">
+<li id="v1.4.0" data-minor="1.4"><span class="ver">1.4.0</span> <span class="date">11 Oct 2026</span> <b>npm package</b> <span class="cap">Installs from one package; the agentboard command opens the strip.</span></li>
+<li id="v1.3.0" data-minor="1.3"><span class="ver">1.3.0</span> <span class="date">11 Oct 2026</span> <b>Start a board</b> <span class="cap">Several sessions in one folder? One click puts a board between their desks.</span></li>
+<li id="v1.2.0" data-minor="1.2"><span class="ver">1.2.0</span> <span class="date">11 Oct 2026</span> <b>One session, the wall, sounds</b> <span class="cap">A session alone shows its workflow&#x27;s phases; the wall shows tokens and your limits.</span></li>
+<li id="v1.1.0" data-minor="1.1"><span class="ver">1.1.0</span> <span class="date">11 Oct 2026</span> <b>Workspaces</b> <span class="cap">Doors to your other workspaces, each counting what waits on you there.</span></li>
+<li id="v1.0.0" data-minor="1.0"><span class="ver">1.0.0</span> <span class="date">11 Oct 2026</span> <b>Daily driver</b> <span class="cap">Search everything your sessions said and decided, from the panel&#x27;s header.</span></li>
+<li id="v0.4.0" data-minor="0.4"><span class="ver">0.4.0</span> <span class="date">11 Oct 2026</span> <b>Needs you, workflows, board</b> <span class="cap">The gate counts what waits on you; the Needs you tab lists it.</span></li>
+<li id="v0.3.0" data-minor="0.3"><span class="ver">0.3.0</span> <span class="date">11 Oct 2026</span> <b>Strip</b> <span class="cap">Your sessions at their desks above the Dock, every event played as it happens.</span></li>
+<li id="v0.2.0" data-minor="0.2"><span class="ver">0.2.0</span> <span class="date">11 Oct 2026</span> <b>Panel</b> <span class="cap">The panel: your sessions&#x27; messages, decisions and PR threads, live.</span></li>
+<li id="v0.1.0" data-minor="0.1"><span class="ver">0.1.0</span> <span class="date">11 Oct 2026</span> <b>Reading your sessions</b> <span class="cap">Agentboard starts reading what your sessions write; nothing to look at yet.</span></li>
+</ul></details>
+<footer class="foot">Every session, PR, ticket and message on this page is made up.</footer></div>
+  </div>
+</main>
+<script>
+// Routes: #guide/latest, #guide/<minor>, #guide/<minor>/<section>, #whatsnew, #whatsnew/<version or minor>.
+// A minor with no guide page opens its What's new; any other hash lands on the latest guide.
+// The guide page talks to this shell with postMessage: it says when it is ready and which section is in view, and asks
+// for What's new; the shell tells it the latest version and the theme the viewer chose.
+const GUIDES = ["2.7", "2.6"];
+const NOTES = ["2.5", "2.4", "2.3", "2.2", "2.1", "2.0"];
+const LATEST = GUIDES[0];
+const frame = document.getElementById('frame');
+const pick = document.getElementById('version');
+const older = document.getElementById('older');
+const news = document.getElementById('p-whatsnew');
+let shown = null;
+let viaLatest = true;
+const tell = () => {
+  try { frame.contentWindow.postMessage({ agentboard: 'shell', latest: LATEST, theme: document.documentElement.dataset.theme || null }, '*'); } catch (e) {}
+};
+const quietly = (h) => { try { history.replaceState(null, '', '#' + h); } catch (e) {} };
+function tab(t) {
+  for (const b of document.querySelectorAll('.tab')) b.setAttribute('aria-selected', String(b.dataset.tab === t));
+  document.getElementById('p-guide').hidden = t !== 'guide';
+  news.hidden = t !== 'whatsnew';
+  document.getElementById('vpick').hidden = t !== 'guide';
+  if (t !== 'guide') older.hidden = true;
+}
+function guide(v, section) {
+  viaLatest = v === 'latest' || !GUIDES.includes(v);
+  const minor = viaLatest ? LATEST : v;
+  tab('guide');
+  pick.value = minor;
+  older.hidden = minor === LATEST;
+  document.getElementById('older-v').textContent = minor;
+  const src = 'guide/' + minor + '.html' + (section ? '#' + section : '');
+  if (shown !== minor || section) frame.src = src;
+  shown = minor;
+}
+function whatsnew(id) {
+  tab('whatsnew');
+  if (!id) return;
+  // a link to one release shows it, whatever type the chips show
+  show('all');
+  let el =document.getElementById('v' + id) || document.getElementById('g' + id) || news.querySelector('[data-minor="' + CSS.escape(id) + '"]');
+  if (!el) return;
+  const box = el.closest('details.before-app');
+  if (box) box.open = true;
+  el.scrollIntoView({ block: 'start' });
+}
+function route() {
+  let h = decodeURIComponent(location.hash.slice(1));
+  if (h === 'releases' || h.startsWith('releases/')) { h = 'whatsnew' + h.slice(8); quietly(h); }
+  const [t, ...rest] = h.split('/');
+  if (t === 'whatsnew') return whatsnew(rest[0]);
+  if (t !== 'guide') { quietly('guide/latest'); return guide('latest', ''); }
+  const v = rest[0] || 'latest';
+  if (v !== 'latest' && !GUIDES.includes(v)) {
+    // a minor with no guide page has release notes only; anything else is the latest guide
+    if (NOTES.includes(v)) { quietly('whatsnew/' + v); return whatsnew(v); }
+    quietly('guide/latest');
+    return guide('latest', '');
+  }
+  guide(v, rest.slice(1).join('/'));
+}
+for (const b of document.querySelectorAll('.tab')) {
+  b.addEventListener('click', () => {
+    const t = b.dataset.tab;
+    location.hash = t === 'guide' ? 'guide/' + (viaLatest || !shown ? 'latest' : shown) : t;
+  });
+}
+pick.addEventListener('change', () => {
+  const v = pick.value;
+  location.hash = v.startsWith('notes:') ? 'whatsnew/' + v.slice(6) : 'guide/' + (v === LATEST ? 'latest' : v);
+});
+addEventListener('message', (e) => {
+  if (e.source !== frame.contentWindow) return;
+  const d = e.data || {};
+  if (d.agentboard === 'ready') tell();
+  else if (d.agentboard === 'nav' && typeof d.hash === 'string' && /^[A-Za-z0-9./-]+$/.test(d.hash)) location.hash = d.hash;
+  else if (d.agentboard === 'guide' && GUIDES.includes(d.minor) && /^[A-Za-z0-9-]*$/.test(d.section || '')) {
+    quietly('guide/' + (viaLatest && d.minor === LATEST ? 'latest' : d.minor) + (d.section ? '/' + d.section : ''));
+  }
+});
+frame.addEventListener('load', tell);
+new MutationObserver(tell).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+// What's new shows every change, or only the new, improved or fixed ones
+const wn = news.querySelector('.wn');
+function show(t) {
+  wn.dataset.show = t;
+  for (const b of wn.querySelectorAll('.show button')) b.setAttribute('aria-pressed', String(b.dataset.show === t));
+}
+for (const b of wn.querySelectorAll('.show button')) b.addEventListener('click', () => show(b.dataset.show));
+addEventListener('hashchange', route);
+route();
+</script>
+</body>
+</html>
