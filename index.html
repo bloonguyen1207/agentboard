@@ -4,11 +4,25 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Agentboard</title>
+<meta name="description" content="Your Claude Code sessions at work above the Dock: what they tell each other, decide and need from you. It reads only what your sessions already write.">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Agentboard">
+<meta property="og:title" content="Agentboard">
+<meta property="og:description" content="Your Claude Code sessions at work above the Dock: what they tell each other, decide and need from you. It reads only what your sessions already write.">
+<meta property="og:url" content="https://bloonguyen1207.github.io/agentboard/">
+<meta property="og:image" content="https://bloonguyen1207.github.io/agentboard/img/icon-512.png">
+<meta property="og:image:width" content="512">
+<meta property="og:image:height" content="512">
+<meta property="og:image:alt" content="The Agentboard app icon">
+<meta name="twitter:card" content="summary">
+<link rel="icon" type="image/png" sizes="32x32" href="img/icon-32.png">
+<link rel="icon" type="image/png" sizes="64x64" href="img/icon-64.png">
+<link rel="apple-touch-icon" href="img/icon-192.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=JetBrains+Mono:wght@400&family=Silkscreen&display=swap">
 <style>
-/* Layout: a slim bar of tabs over one full-height view: the guide for a version in a frame, or What's new as a reading column */
+/* Layout: a slim bar with a link to each view over one full-height view: the guide for a version in a frame, or Why Agentboard or What's new as a reading column */
 
 :root{
   color-scheme:light;
@@ -29,6 +43,9 @@ code{ font-family:var(--mono); font-size:.85em; }
 .bar{ display:flex; flex-wrap:wrap; align-items:center; gap:8px 18px; padding:calc(10px + env(safe-area-inset-top,0px)) 16px 10px; border-bottom:1px solid var(--line); background:var(--surface); }
 .brand{ font-family:var(--display); font-size:1rem; letter-spacing:.03em; }
 .brand small{ font-size:.7rem; color:var(--muted); margin-left:6px; }
+/* the app icon as the logo, at twice its 32-pixel grid and shown at 32 px, so each of its pixels stays square */
+.brand.mark{ display:inline-flex; align-items:center; gap:8px; }
+.brand.mark img{ display:block; width:32px; height:32px; image-rendering:pixelated; }
 .tabs{ display:flex; gap:4px; }
 .tab{ font:inherit; font-weight:700; font-size:.9rem; padding:6px 12px; border-radius:6px; border:1px solid transparent; background:none; color:var(--muted); cursor:pointer; }
 .tab[aria-selected="true"]{ color:var(--ink); border-color:var(--line); background:var(--bg); }
@@ -36,10 +53,9 @@ select{ font:inherit; font-size:.86rem; padding:5px 8px; border-radius:6px; bord
 .pick{ display:flex; align-items:center; gap:6px; }
 .note{ color:var(--muted); font-size:.82rem; }
 .bar .note{ margin-left:auto; }
-.bar .made{ margin-left:auto; color:var(--muted); font-size:.82rem; }
-.get{ font-weight:700; font-size:.88rem; padding:6px 12px; border-radius:6px; background:var(--accent); color:var(--surface); text-decoration:none; white-space:nowrap; }
+/* Download for Mac keeps to the right of the bar, at every width */
+.get{ margin-left:auto; font-weight:700; font-size:.88rem; padding:6px 12px; border-radius:6px; background:var(--accent); color:var(--surface); text-decoration:none; white-space:nowrap; }
 .get:hover{ background:var(--ink); }
-@media (max-width:700px){ .bar .made{ display:none; } .get{ margin-left:auto; } }
 .older{ margin:0; padding:8px 16px; background:var(--surface-2); border-bottom:1px solid var(--line); font-size:.9rem; }
 main{ flex:1; min-height:0; display:flex; }
 .framewrap{ flex:1; display:flex; }
@@ -136,23 +152,137 @@ iframe{ flex:1; border:0; width:100%; background:var(--bg); }
 .foot{ font-size:.84rem; color:var(--muted); border-top:1px solid var(--line); padding-top:14px; }
 @media (max-width:760px){ .vis.pair{ grid-template-columns:1fr; } .rel .date{ margin-left:0; } }
 
+.vh{ position:absolute; width:1px; height:1px; margin:-1px; padding:0; border:0; overflow:hidden; clip:rect(0 0 0 0); clip-path:inset(50%); white-space:nowrap; }
+/* The bar: the logo, the three views as links (each is a route, so Back and Forward, a new tab and a copied link all
+   work), the version picker on the Guide, and Download for Mac at the right end. When one row cannot hold it, the logo
+   and Download for Mac go on top and the views and the picker under them. Narrower, the labels shorten so the bar keeps
+   to two rows and nothing wraps inside a button: Why, without the word Version, then Download and the bare version
+   number. The full names stay in the links' accessible names. The widths follow the reader's text size: at the default
+   16 px, 32.4375em is 519 px, 22.4375em 359 px and 19.9375em 319 px. One row needs about 280 px plus 36em: 856 px with
+   16 px text, 1000 with 20 and 1144 with 24. So two rows take over under 900 px, or under 52.5em with larger text. */
+.bar a.tab{ display:inline-block; text-decoration:none; white-space:nowrap; }
+.bar a.tab:hover{ color:var(--ink); }
+.bar a.tab[aria-current="page"]{ color:var(--ink); border-color:var(--line); background:var(--bg); }
+@media (max-width:900px), (max-width:52.5em){
+  .bar .brand{ flex:1 0 50%; }
+  .bar .get{ order:1; }
+  .bar .tabs, .bar .pick{ order:2; }
+}
+@media (max-width:32.4375em){
+  .bar{ column-gap:12px; }
+  .bar .tabs{ gap:2px; }
+  .bar .tab{ padding-inline:8px; }
+  .bar .tab .long, .bar .pick .note{ position:absolute; width:1px; height:1px; margin:-1px; padding:0; border:0; overflow:hidden; clip-path:inset(50%); white-space:nowrap; }
+}
+@media (max-width:22.4375em){
+  .bar{ column-gap:10px; }
+  .bar select{ padding-inline:4px; }
+  .bar .get .long{ position:absolute; width:1px; height:1px; margin:-1px; padding:0; border:0; overflow:hidden; clip-path:inset(50%); white-space:nowrap; }
+}
+/* a screen narrower still: the logo without its name, and the picker beside it */
+@media (max-width:19.9375em){
+  .bar .brand{ flex:0 0 auto; }
+  .bar .brand .word{ position:absolute; width:1px; height:1px; margin:-1px; padding:0; border:0; overflow:hidden; clip-path:inset(50%); white-space:nowrap; }
+  .bar .pick{ order:1; }
+}
+/* Why Agentboard: a feature matrix, in a column as wide as What's new's, so switching views moves nothing; both views
+   keep room for a scrollbar that takes space (Windows, or a Mac set to show scrollbars), whether they scroll or not.
+   Each mark is a word with a shape beside it: filled, half, empty or dotted, growing with the reader's text size as the
+   word does. The matrix's head row stays at the top of the view while the rows scroll under it; the view's top padding
+   moves into the column, so the head row sits flush there. The matrix fits the column down to small phones. Where it
+   cannot (a very narrow screen, or large text), it scrolls in its own box, no taller than the view has room for once
+   scrolled to its end, with its first column held, a hint above it and a shaded edge on the side that has more; only
+   then is the box a stop for the Tab key. Sideways, it comes to rest only at a column's edge, so a column shows whole or
+   not at all. */
+#p-why, #p-whatsnew{ scrollbar-gutter:stable; }
+#p-why{ padding-top:0; }
+.why{ max-width:74rem; padding-top:28px; grid-template-columns:minmax(0,1fr); gap:14px; }
+.why h1{ margin:0 0 6px; font-family:var(--display); font-weight:400; font-size:1.5rem; }
+.why .key{ margin:0; padding:0; list-style:none; display:flex; flex-wrap:wrap; gap:6px 20px; font-size:.86rem; line-height:1.4; color:var(--muted); }
+.why .hint{ margin:0; font-size:.86rem; font-weight:700; }
+.mx{ position:relative; max-width:58rem; border:1px solid var(--line); border-radius:10px; background:var(--surface); overflow:clip; }
+.mx::after{ content:""; position:absolute; top:0; right:0; bottom:0; width:36px; pointer-events:none; background:linear-gradient(to left, color-mix(in srgb, var(--surface) 85%, transparent), transparent); opacity:0; transition:opacity .2s; }
+.mx[data-right="true"]::after{ opacity:1; }
+.why .tw{ overflow:visible; }
+.mx[data-scroll="true"] .tw{ overflow:auto; overscroll-behavior-x:contain; scroll-snap-type:x mandatory; }
+.mx[data-scroll="true"] thead th:not(.stick){ scroll-snap-align:start; }
+.mx:has(> .tw:focus-visible){ outline:2px solid var(--focus); outline-offset:2px; }
+.mx .tw:focus-visible{ outline:none; }
+.why table{ width:100%; border:0; border-radius:0; background:none; border-collapse:separate; border-spacing:0; font-size:.92rem; }
+.why col{ width:calc(64% / 3); }
+.why col.feat{ width:36%; }
+.why th, .why td{ padding:11px 14px; border-top:1px solid var(--line); vertical-align:middle; line-height:1.35; text-align:left; }
+.why thead th{ position:sticky; top:0; z-index:2; border-top:0; padding-block:13px; background:var(--surface); box-shadow:inset 0 -1px 0 var(--line); font-size:.95rem; color:var(--ink); }
+.why tbody th{ font-weight:400; }
+.why .stick{ position:sticky; left:0; z-index:1; background:var(--surface); }
+.why thead th.stick{ z-index:3; }
+.mx[data-left="true"] tbody .stick{ box-shadow:inset -1px 0 0 var(--line), 8px 0 8px -8px rgba(10,20,35,.45); }
+.mx[data-left="true"] thead .stick{ box-shadow:inset 0 -1px 0 var(--line), inset -1px 0 0 var(--line), 8px 0 8px -8px rgba(10,20,35,.45); }
+.why .ours{ background:color-mix(in srgb, var(--accent) 6%, var(--surface)); }
+/* the basics, in words, under a heavier rule */
+.why .basics tr:first-child > *{ border-top:2px solid var(--line); }
+.why .basics td{ font-size:.88rem; }
+.mk{ display:inline-flex; align-items:center; gap:7px; font-weight:700; font-size:.86rem; line-height:1.25; }
+.mk i{ flex:none; width:.6875rem; height:.6875rem; border-radius:50%; border:2px solid var(--c); }
+.mk.yes{ --c:var(--ok); } .mk.yes i{ background:var(--c); }
+.mk.partial{ --c:var(--wait); } .mk.partial i{ background:linear-gradient(90deg, var(--c) 50%, transparent 50%); }
+.mk.no{ --c:var(--muted); }
+.mk.nd{ --c:var(--muted); color:var(--muted); } .mk.nd i{ border-style:dotted; }
+.why .q{ display:block; margin:3px 0 0 18px; font-size:.8rem; color:var(--muted); white-space:nowrap; }
+.why .checked{ margin:0; max-width:58rem; color:var(--muted); font-size:.86rem; line-height:1.5; }
+/* a phone: smaller type and tighter cells, so the four columns fit; a mark's words wrap beside its shape */
+@media (max-width:600px){
+  .why table{ font-size:.84rem; }
+  .why col{ width:calc(70% / 3); }
+  .why col.feat{ width:30%; }
+  .why th, .why td{ padding:9px 6px; }
+  .why tr > :first-child{ padding-left:10px; }
+  .why tr > :last-child{ padding-right:8px; }
+  .why thead th{ font-size:.84rem; }
+  .why .basics td{ font-size:.8rem; }
+  .mk{ align-items:flex-start; gap:5px; font-size:.8rem; }
+  .mk i{ margin-top:.12em; width:.625rem; height:.625rem; }
+  .why .q{ margin-left:0; font-size:.76rem; }
+}
+/* a small phone: smaller heads and tighter cells still */
+@media (max-width:359px){
+  .why th, .why td{ padding-inline:5px; }
+  .why tr > :first-child{ padding-left:8px; }
+  .why tr > :last-child{ padding-right:6px; }
+  .why thead th{ font-size:.78rem; }
+}
+@media (prefers-reduced-motion: reduce){ .mx::after{ transition:none; } }
+
 </style>
 </head>
 <body>
 <div class="bar">
-  <span class="brand">Agentboard</span>
-  <div class="tabs" role="tablist" aria-label="Documentation">
-    <button class="tab" role="tab" id="t-guide" aria-controls="p-guide" data-tab="guide">Guide</button>
-    <button class="tab" role="tab" id="t-whatsnew" aria-controls="p-whatsnew" data-tab="whatsnew">What’s new</button>
-  </div>
+  <span class="brand mark"><img src="img/icon-64.png" width="32" height="32" alt=""><span class="word">Agentboard</span></span>
+  <nav class="tabs" aria-label="Documentation">
+    <a class="tab" id="t-guide" href="#guide/latest" data-tab="guide">Guide</a>
+    <a class="tab" id="t-why" href="#why" data-tab="why">Why<span class="long"> Agentboard</span></a>
+    <a class="tab" id="t-whatsnew" href="#whatsnew" data-tab="whatsnew">What’s new</a>
+  </nav>
   <label class="pick" id="vpick"><span class="note">Version</span><select id="version" aria-label="Guide version"><option value="2.7">2.7 · latest</option><option value="2.6">2.6</option><optgroup label="Earlier: release notes"><option value="notes:2.5">2.5</option><option value="notes:2.4">2.4</option><option value="notes:2.3">2.3</option><option value="notes:2.2">2.2</option><option value="notes:2.1">2.1</option><option value="notes:2.0">2.0</option></optgroup></select></label>
-  <span class="made">Every name in the examples is made up.</span>
-  <a class="get" href="https://github.com/bloonguyen1207/agentboard/releases/latest" target="_blank" rel="noopener">Download for Mac</a>
+  <a class="get" href="https://github.com/bloonguyen1207/agentboard/releases/latest" target="_blank" rel="noopener">Download<span class="long"> for Mac</span></a>
 </div>
 <p class="older" id="older" hidden>This is the guide for <span id="older-v"></span>. <a href="#guide/latest">The latest is 2.7 →</a></p>
 <main>
-  <div id="p-guide" class="framewrap" role="tabpanel" aria-labelledby="t-guide"><iframe id="frame" title="Agentboard guide"></iframe></div>
-  <div id="p-whatsnew" class="read" role="tabpanel" aria-labelledby="t-whatsnew" hidden>
+  <div id="p-guide" class="framewrap"><iframe id="frame" title="Agentboard guide"></iframe></div>
+  <div id="p-why" class="read" hidden>
+<div class="col why">
+<h1>Why Agentboard?</h1>
+<ul class="key" aria-label="The marks"><li><span class="mk yes"><i></i>Yes</span></li><li><span class="mk partial"><i></i>Partly</span></li><li><span class="mk no"><i></i>No</span></li><li><span class="mk nd"><i></i>Not in its docs</span>: its own site and docs don’t describe it</li></ul>
+<p class="hint" id="why-hint" hidden>Scroll the table sideways for Pixel Agents and Crew <span aria-hidden="true">→</span></p>
+<div class="mx" id="why-mx"><div class="tw">
+<table><caption id="why-cap" class="vh">Agentboard, Pixel Agents and Crew, feature by feature</caption><colgroup><col class="feat"><col><col><col></colgroup><thead><tr><th scope="col" class="stick"><span class="vh">Feature</span></th><th scope="col" class="ours">Agentboard</th><th scope="col">Pixel Agents</th><th scope="col">Crew</th></tr></thead>
+<tbody><tr><th scope="row" class="stick">Messages between sessions</th><td class="ours"><span class="mk yes"><i></i>Yes</span></td><td><span class="mk partial"><i></i>Partly</span></td><td><span class="mk nd"><i></i>Not in its docs</span></td></tr><tr><th scope="row" class="stick">Decisions, claims, merge queue</th><td class="ours"><span class="mk yes"><i></i>Yes</span></td><td><span class="mk no"><i></i>No</span></td><td><span class="mk nd"><i></i>Not in its docs</span></td></tr><tr><th scope="row" class="stick">Shared plans</th><td class="ours"><span class="mk yes"><i></i>Yes</span></td><td><span class="mk no"><i></i>No</span></td><td><span class="mk nd"><i></i>Not in its docs</span></td></tr><tr><th scope="row" class="stick">Subagents and workflow runs</th><td class="ours"><span class="mk yes"><i></i>Yes</span></td><td><span class="mk partial"><i></i>Partly</span></td><td><span class="mk partial"><i></i>Partly</span></td></tr><tr><th scope="row" class="stick">Done tells the session to check</th><td class="ours"><span class="mk yes"><i></i>Yes</span></td><td><span class="mk no"><i></i>No</span></td><td><span class="mk nd"><i></i>Not in its docs</span></td></tr><tr><th scope="row" class="stick">History and search</th><td class="ours"><span class="mk yes"><i></i>Yes</span></td><td><span class="mk no"><i></i>No</span></td><td><span class="mk nd"><i></i>Not in its docs</span></td></tr><tr><th scope="row" class="stick">Warning before Claude Code deletes a session</th><td class="ours"><span class="mk yes"><i></i>Yes</span></td><td><span class="mk no"><i></i>No</span></td><td><span class="mk nd"><i></i>Not in its docs</span></td></tr><tr><th scope="row" class="stick">Jump to a session, approve prompts</th><td class="ours"><span class="mk no"><i></i>No</span></td><td><span class="mk partial"><i></i>Partly</span></td><td><span class="mk yes"><i></i>Yes</span><span class="q"><span class="vh">, </span>Pro (Mac)</span></td></tr></tbody>
+<tbody class="basics"><tr><th scope="row" class="stick">Coding agents</th><td class="ours">Claude Code</td><td>Claude Code</td><td>Claude Code, GitHub Copilot CLI, Cursor</td></tr><tr><th scope="row" class="stick">Where it runs</th><td class="ours">Mac with Apple silicon</td><td>VS Code or a browser; Windows, macOS, Linux</td><td>Mac and Windows</td></tr><tr><th scope="row" class="stick">Price</th><td class="ours">Free for one folder; Pro is coming</td><td>Free and open source (MIT)</td><td>Free; Pro $12 once on Mac</td></tr></tbody>
+</table></div></div>
+<p class="checked">Checked 13 October 2026, from each tool’s own site and docs: <a href="#guide/2.7">Agentboard 2.7.0</a>, <a href="https://github.com/pixel-agents-hq/pixel-agents/tree/v1.4.1" target="_blank" rel="noopener">Pixel Agents 1.4.1</a> and <a href="https://crew-deskmates.vercel.app/crew/" target="_blank" rel="noopener">Crew 2.5</a>.</p>
+</div>
+  </div>
+  <div id="p-whatsnew" class="read" hidden>
 <div class="col wn" data-show="all">
 <header class="wn-head"><h1>What’s new</h1><p>Every release, newest first, its changes marked new, improved or fixed. A change you can see comes with a picture, drawn by that release’s own code.</p><div class="show" role="group" aria-label="Show changes"><button type="button" data-show="all" aria-pressed="true">All</button><button type="button" data-show="new" aria-pressed="false"><i class="t-new"></i>New</button><button type="button" data-show="improved" aria-pressed="false"><i class="t-improved"></i>Improved</button><button type="button" data-show="fixed" aria-pressed="false"><i class="t-fixed"></i>Fixed</button></div></header>
 <section class="minor" id="g2.7" data-minor="2.7" data-types="new improved fixed"><h2>2.7</h2><article class="rel k-feature" id="v2.7.0" data-types="new improved fixed"><header><span class="ver">2.7.0</span><h3>Rooms</h3><span class="kind t-new">Feature</span><span class="date">13 Oct 2026</span></header><div class="pic" data-type="new"><div class="vis pair stacked"><figure class="art"><figcaption>Before · 2.6.4</figcaption><div class="pxbox"><img class="px" src="img/whatsnew/2.7.0-before.png" width="512" height="100" style="--aw:256;--mx:4" loading="lazy" decoding="async" alt="Before, in 2.6.4: DOCS, which is on no board, sent FRONTEND one message and got a desk beside BACKEND and FRONTEND, as if it were on their board."></div></figure><figure class="art"><figcaption>After · 2.7.0</figcaption><div class="pxbox"><img class="px" src="img/whatsnew/2.7.0-after.png" width="512" height="100" style="--aw:256;--mx:4" loading="lazy" decoding="async" alt="After, in 2.7.0: BACKEND and FRONTEND keep their desks by the claims board. DOCS has no desk here and stands facing FRONTEND with a visitor badge; the DOCS door on the left leads to its own room. Each desk now has a small red phone."></div></figure></div><p class="cap"><span class="tag t-new">New</span> Rooms replace crews. Sessions visit other rooms as guests, by message or by desk phone.</p></div><div class="grp" data-type="new"><h4 class="t-new">New</h4><ul><li>Several boards per folder, joined only by <code>/agentboard</code> or Settings; plans show in a Plans tab.</li><li>A free look, Áo cờ, after Việt Nam&#x27;s flag, is the default and the app icon&#x27;s.</li></ul></div><div class="grp" data-type="improved"><h4 class="t-improved">Improved</h4><ul><li>In Needs you, Done replaces Dismiss for hand-backs and PRs, and tells their session to check.</li><li>Settings opens from the top bar; tick its session hooks again. The macOS notification is gone.</li></ul></div><div class="grp" data-type="fixed"><h4 class="t-fixed">Fixed</h4><ul><li>A workflow board kept its last run for good, all green even if it failed; now it says FAILED or STOPPED, and clears after ten minutes.</li></ul></div></article></section>
@@ -178,7 +308,8 @@ iframe{ flex:1; border:0; width:100%; background:var(--bg); }
   </div>
 </main>
 <script>
-// Routes: #guide/latest, #guide/<minor>, #guide/<minor>/<section>, #whatsnew, #whatsnew/<version or minor>.
+// Routes: #guide/latest, #guide/<minor>, #guide/<minor>/<section>, #why, #whatsnew, #whatsnew/<version or minor>.
+// The bar's links are the routes, so Back and Forward step through the views, and a view opens in a new tab.
 // A minor with no guide page opens its What's new; any other hash lands on the latest guide.
 // The guide page talks to this shell with postMessage: it says when it is ready and which section is in view, and asks
 // for What's new; the shell tells it the latest version and the theme the viewer chose.
@@ -189,16 +320,24 @@ const frame = document.getElementById('frame');
 const pick = document.getElementById('version');
 const older = document.getElementById('older');
 const news = document.getElementById('p-whatsnew');
+const why = document.getElementById('p-why');
 let shown = null;
 let viaLatest = true;
 const tell = () => {
   try { frame.contentWindow.postMessage({ agentboard: 'shell', latest: LATEST, theme: document.documentElement.dataset.theme || null }, '*'); } catch (e) {}
 };
 const quietly = (h) => { try { history.replaceState(null, '', '#' + h); } catch (e) {} };
+// each view names itself in the browser's tab, its bookmarks and its history
+const TITLES = { why: 'Why Agentboard?', whatsnew: 'What’s new · Agentboard' };
 function tab(t) {
-  for (const b of document.querySelectorAll('.tab')) b.setAttribute('aria-selected', String(b.dataset.tab === t));
+  for (const a of document.querySelectorAll('.bar .tab')) {
+    if (a.dataset.tab === t) a.setAttribute('aria-current', 'page');
+    else a.removeAttribute('aria-current');
+  }
+  document.title = TITLES[t] || 'Agentboard';
   document.getElementById('p-guide').hidden = t !== 'guide';
   news.hidden = t !== 'whatsnew';
+  why.hidden = t !== 'why';
   document.getElementById('vpick').hidden = t !== 'guide';
   if (t !== 'guide') older.hidden = true;
 }
@@ -209,8 +348,12 @@ function guide(v, section) {
   pick.value = minor;
   older.hidden = minor === LATEST;
   document.getElementById('older-v').textContent = minor;
+  // the Guide link goes back to the version shown
+  document.getElementById('t-guide').setAttribute('href', '#guide/' + (viaLatest ? 'latest' : minor));
   const src = 'guide/' + minor + '.html' + (section ? '#' + section : '');
-  if (shown !== minor || section) frame.src = src;
+  // the frame moves without a history entry of its own, so Back undoes the shell's route in one step
+  if (!frame.getAttribute('src')) frame.src = src;
+  else if (shown !== minor || section) frame.contentWindow.location.replace(new URL(src, location.href).href);
   shown = minor;
 }
 function whatsnew(id) {
@@ -224,11 +367,16 @@ function whatsnew(id) {
   if (box) box.open = true;
   el.scrollIntoView({ block: 'start' });
 }
+function compare() {
+  tab('why');
+  fit();
+}
 function route() {
   let h = decodeURIComponent(location.hash.slice(1));
   if (h === 'releases' || h.startsWith('releases/')) { h = 'whatsnew' + h.slice(8); quietly(h); }
   const [t, ...rest] = h.split('/');
   if (t === 'whatsnew') return whatsnew(rest[0]);
+  if (t === 'why') return compare();
   if (t !== 'guide') { quietly('guide/latest'); return guide('latest', ''); }
   const v = rest[0] || 'latest';
   if (v !== 'latest' && !GUIDES.includes(v)) {
@@ -239,16 +387,19 @@ function route() {
   }
   guide(v, rest.slice(1).join('/'));
 }
-for (const b of document.querySelectorAll('.tab')) {
-  b.addEventListener('click', () => {
-    const t = b.dataset.tab;
-    location.hash = t === 'guide' ? 'guide/' + (viaLatest || !shown ? 'latest' : shown) : t;
-  });
-}
 pick.addEventListener('change', () => {
   const v = pick.value;
   location.hash = v.startsWith('notes:') ? 'whatsnew/' + v.slice(6) : 'guide/' + (v === LATEST ? 'latest' : v);
 });
+// on a small phone, or with large text, the version picker names only the version, so the bar keeps to two rows (the
+// width in em, as the bar's own, is 359 px at the default text size)
+const small = matchMedia('(max-width: 22.4375em)');
+const labels = [...pick.options].map((o) => o.textContent);
+function relabel() {
+  [...pick.options].forEach((o, i) => { o.textContent = small.matches ? labels[i].split(' · ')[0] : labels[i]; });
+}
+if (small.addEventListener) small.addEventListener('change', relabel);
+relabel();
 addEventListener('message', (e) => {
   if (e.source !== frame.contentWindow) return;
   const d = e.data || {};
@@ -267,6 +418,57 @@ function show(t) {
   for (const b of wn.querySelectorAll('.show button')) b.setAttribute('aria-pressed', String(b.dataset.show === t));
 }
 for (const b of wn.querySelectorAll('.show button')) b.addEventListener('click', () => show(b.dataset.show));
+// Why Agentboard's matrix fits its column down to small phones. Where it cannot (a very narrow screen, or large text) it
+// scrolls in its own box, with a hint above it and the edge with more to see shaded; only then is the box a stop for
+// the Tab key, named by the matrix's caption. The box is no taller than the view has room for once scrolled to its end,
+// so its head row never leaves the view. Sideways it comes to rest only where a tool's column starts beside the held
+// one; room after the last column lets the scroll reach such a place, so no sliver of a column shows.
+const mx = document.getElementById('why-mx'), tw = mx.querySelector('.tw'), matrix = tw.querySelector('table'), heads = matrix.tHead.rows[0].cells;
+const set = (style, k, v) => { if (style[k] !== v) style[k] = v; };
+function fit() {
+  if (why.hidden) return;
+  // the matrix's own width, without the room added after its last column
+  const added = parseFloat(matrix.style.borderRightWidth) || 0;
+  const natural = matrix.getBoundingClientRect().width - added;
+  const wide = natural > tw.clientWidth + 1;
+  if (String(wide) !== mx.dataset.scroll) {
+    mx.dataset.scroll = String(wide);
+    if (wide) { tw.tabIndex = 0; tw.setAttribute('role', 'region'); tw.setAttribute('aria-labelledby', 'why-cap'); }
+    else { tw.removeAttribute('tabindex'); tw.removeAttribute('role'); tw.removeAttribute('aria-labelledby'); }
+  }
+  if (wide) {
+    // what follows the box in the view, down to the view's end, and the box's own top edge
+    const v = why.getBoundingClientRect(), b = tw.getBoundingClientRect();
+    const below = why.scrollHeight - (b.bottom - v.top + why.scrollTop), edge = b.top - mx.getBoundingClientRect().top;
+    set(tw.style, 'maxHeight', Math.max(240, Math.floor(why.clientHeight - below - edge)) + 'px');
+    // the first place, from the left, where a tool's column starts beside the held one at or past the scroll's end
+    const room = natural - tw.clientWidth, start = heads[1].getBoundingClientRect().left;
+    let add = 0;
+    for (let i = 1; i < heads.length - 1; i++) {
+      const at = heads[i].getBoundingClientRect().right - start;
+      if (at >= room) { add = Math.ceil(at - room); break; }
+    }
+    set(matrix.style, 'borderRight', add ? add + 'px solid transparent' : '');
+    set(tw.style, 'scrollPaddingLeft', heads[0].getBoundingClientRect().width + 'px');
+  } else {
+    set(tw.style, 'maxHeight', '');
+    set(matrix.style, 'borderRight', '');
+    set(tw.style, 'scrollPaddingLeft', '');
+  }
+  edges();
+}
+function edges() {
+  const room = mx.dataset.scroll === 'true' ? tw.scrollWidth - tw.clientWidth : 0;
+  document.getElementById('why-hint').hidden = room <= 1;
+  mx.dataset.left = String(room > 1 && tw.scrollLeft > 1);
+  mx.dataset.right = String(room > 1 && tw.scrollLeft < room - 1);
+}
+tw.addEventListener('scroll', edges, { passive: true });
+// the view's size and the matrix's (the fonts once they load, the reader's text size) decide whether the matrix fits and
+// how tall its box is; fit() waits for the next frame there, as it may change the matrix's own size
+if (window.ResizeObserver) { const ro = new ResizeObserver(() => requestAnimationFrame(fit)); ro.observe(why); ro.observe(matrix); }
+else addEventListener('resize', fit);
+if (document.fonts) document.fonts.ready.then(fit);
 addEventListener('hashchange', route);
 route();
 </script>
