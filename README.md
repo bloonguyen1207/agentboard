@@ -5,9 +5,7 @@ Your Claude Code sessions at work above the Dock: what they tell each other, dec
 **[Download for Mac](https://github.com/bloonguyen1207/agentboard/releases/latest)** · [Guide](https://bloonguyen1207.github.io/agentboard/)
 
 - For Macs with Apple silicon, with Claude Code.
-- Free for one folder. Pro, a one-time licence, covers every folder.
-
-Releases start with 2.7.0.
+- Free for one folder. Pro, a one-time licence for every folder, is coming.
 
 ## Install
 
