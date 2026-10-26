@@ -3,17 +3,17 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Agentboard</title>
+<title>AgentBoard</title>
 <meta name="description" content="Your Claude Code sessions at work above the Dock: what they tell each other, decide and need from you. It reads only what your sessions already write.">
 <meta property="og:type" content="website">
-<meta property="og:site_name" content="Agentboard">
-<meta property="og:title" content="Agentboard">
+<meta property="og:site_name" content="AgentBoard">
+<meta property="og:title" content="AgentBoard">
 <meta property="og:description" content="Your Claude Code sessions at work above the Dock: what they tell each other, decide and need from you. It reads only what your sessions already write.">
 <meta property="og:url" content="https://bloonguyen1207.github.io/agentboard/">
 <meta property="og:image" content="https://bloonguyen1207.github.io/agentboard/img/icon-512.png">
 <meta property="og:image:width" content="512">
 <meta property="og:image:height" content="512">
-<meta property="og:image:alt" content="The Agentboard app icon">
+<meta property="og:image:alt" content="The AgentBoard app icon">
 <meta name="twitter:card" content="summary">
 <link rel="icon" type="image/png" sizes="32x32" href="img/icon-32.png">
 <link rel="icon" type="image/png" sizes="64x64" href="img/icon-64.png">
@@ -22,7 +22,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=JetBrains+Mono:wght@400&family=Silkscreen&display=swap">
 <style>
-/* Layout: a slim bar with a link to each view over one full-height view: the guide for a version in a frame, or Why Agentboard or What's new as a reading column */
+/* Layout: a slim bar with a link to each view over one full-height view: the guide for a version in a frame, or Why AgentBoard or What's new as a reading column */
 
 :root{
   color-scheme:light;
@@ -185,71 +185,92 @@ iframe{ flex:1; border:0; width:100%; background:var(--bg); }
   .bar .brand .word{ position:absolute; width:1px; height:1px; margin:-1px; padding:0; border:0; overflow:hidden; clip-path:inset(50%); white-space:nowrap; }
   .bar .pick{ order:1; }
 }
-/* Why Agentboard: a feature matrix, in a column as wide as What's new's, so switching views moves nothing; both views
+/* Why AgentBoard: a feature matrix, in a column as wide as What's new's, so switching views moves nothing; both views
    keep room for a scrollbar that takes space (Windows, or a Mac set to show scrollbars), whether they scroll or not.
    Each mark is a word with a shape beside it: filled, half, empty or dotted, growing with the reader's text size as the
-   word does. The matrix's head row stays at the top of the view while the rows scroll under it; the view's top padding
-   moves into the column, so the head row sits flush there. The matrix fits the column down to small phones. Where it
-   cannot (a very narrow screen, or large text), it scrolls in its own box, no taller than the view has room for once
-   scrolled to its end, with its first column held, a hint above it and a shaded edge on the side that has more; only
-   then is the box a stop for the Tab key. Sideways, it comes to rest only at a column's edge, so a column shows whole or
-   not at all. */
+   word does. The head names the tools in one row, under no group head, and stays at the top of the view while the rows
+   scroll under it; the view's top padding moves into the column, so the head sits flush there. Each column keeps the
+   least width its words need, set by a block in its head, so the matrix fits the column on a laptop. Where it cannot (a
+   phone, a narrow window, or large text), it scrolls in its own box, no taller than the view has room for once scrolled
+   to its end, with its first column held, and AgentBoard's beside it wherever a whole tool's column still shows next
+   to both, so each tool can be read against AgentBoard; a hint sits above the box and the side that has more is
+   shaded; only then is the box a stop for the Tab key. Sideways, it comes to rest only at a column's edge, so no sliver
+   of a column shows beside the held ones. */
 #p-why, #p-whatsnew{ scrollbar-gutter:stable; }
 #p-why{ padding-top:0; }
 .why{ max-width:74rem; padding-top:28px; grid-template-columns:minmax(0,1fr); gap:14px; }
 .why h1{ margin:0 0 6px; font-family:var(--display); font-weight:400; font-size:1.5rem; }
 .why .key{ margin:0; padding:0; list-style:none; display:flex; flex-wrap:wrap; gap:6px 20px; font-size:.86rem; line-height:1.4; color:var(--muted); }
 .why .hint{ margin:0; font-size:.86rem; font-weight:700; }
-.mx{ position:relative; max-width:58rem; border:1px solid var(--line); border-radius:10px; background:var(--surface); overflow:clip; }
+.mx{ position:relative; border:1px solid var(--line); border-radius:10px; background:var(--surface); overflow:clip; }
 .mx::after{ content:""; position:absolute; top:0; right:0; bottom:0; width:36px; pointer-events:none; background:linear-gradient(to left, color-mix(in srgb, var(--surface) 85%, transparent), transparent); opacity:0; transition:opacity .2s; }
 .mx[data-right="true"]::after{ opacity:1; }
 .why .tw{ overflow:visible; }
 .mx[data-scroll="true"] .tw{ overflow:auto; overscroll-behavior-x:contain; scroll-snap-type:x mandatory; }
 .mx[data-scroll="true"] thead th:not(.stick){ scroll-snap-align:start; }
+.mx[data-hold="2"] thead th.ours{ scroll-snap-align:none; }
 .mx:has(> .tw:focus-visible){ outline:2px solid var(--focus); outline-offset:2px; }
 .mx .tw:focus-visible{ outline:none; }
-.why table{ width:100%; border:0; border-radius:0; background:none; border-collapse:separate; border-spacing:0; font-size:.92rem; }
-.why col{ width:calc(64% / 3); }
-.why col.feat{ width:36%; }
-.why th, .why td{ padding:11px 14px; border-top:1px solid var(--line); vertical-align:middle; line-height:1.35; text-align:left; }
-.why thead th{ position:sticky; top:0; z-index:2; border-top:0; padding-block:13px; background:var(--surface); box-shadow:inset 0 -1px 0 var(--line); font-size:.95rem; color:var(--ink); }
-.why tbody th{ font-weight:400; }
+.why table{ width:100%; border:0; border-radius:0; background:none; border-collapse:separate; border-spacing:0; font-size:.9rem; }
+/* a column for each tool, sharing what the feature column leaves */
+.why col{ width:calc(82% / 5); }
+.why col.feat{ width:18%; }
+.why th, .why td{ padding:10px; border-top:1px solid var(--line); vertical-align:middle; line-height:1.35; text-align:left; }
+.why th.stick{ padding-left:14px; }
+/* the room after the last column that lets a sideways scroll end at a column's edge (--end, set as it is drawn) is
+   padding in that column's cells, so the rules and the head run on to the box's edge */
+.why tr > :last-child{ padding-right:calc(var(--pr, 10px) + var(--end, 0px)); }
+/* the least a column takes: the block of its name in the head, or the feature column's own block */
+.why .cw{ display:block; min-width:6rem; }
+.why .fw{ display:block; width:8.5rem; }
+.why thead th{ position:sticky; top:0; z-index:2; border-top:0; padding-block:12px; vertical-align:bottom; background:var(--surface); box-shadow:inset 0 -1px 0 var(--line); font-size:.95rem; color:var(--ink); }
+.why tbody th{ font-weight:400; text-wrap:balance; }
+/* in the rows of marks, each cell's first line on one line with its row's, so the marks line up where a mark's words
+   take a second line */
+.why tbody:not(.basics) > tr > *{ vertical-align:baseline; }
 .why .stick{ position:sticky; left:0; z-index:1; background:var(--surface); }
 .why thead th.stick{ z-index:3; }
-.mx[data-left="true"] tbody .stick{ box-shadow:inset -1px 0 0 var(--line), 8px 0 8px -8px rgba(10,20,35,.45); }
-.mx[data-left="true"] thead .stick{ box-shadow:inset 0 -1px 0 var(--line), inset -1px 0 0 var(--line), 8px 0 8px -8px rgba(10,20,35,.45); }
 .why .ours{ background:color-mix(in srgb, var(--accent) 6%, var(--surface)); }
+/* AgentBoard's column, held from the feature column's edge (--feat) where the box scrolls and a whole tool's column
+   still shows beside both (data-hold, set as it is drawn); the shaded edge goes to the last held column */
+.mx[data-hold="2"] .ours{ position:sticky; left:var(--feat, 0px); z-index:1; }
+.mx[data-hold="2"] thead th.ours{ z-index:3; }
+.mx[data-left="true"] tbody .stick, .mx[data-hold="2"][data-left="true"] tbody .ours{ box-shadow:inset -1px 0 0 var(--line), 8px 0 8px -8px rgba(10,20,35,.45); }
+.mx[data-left="true"] thead .stick, .mx[data-hold="2"][data-left="true"] thead .ours{ box-shadow:inset 0 -1px 0 var(--line), inset -1px 0 0 var(--line), 8px 0 8px -8px rgba(10,20,35,.45); }
 /* the basics, in words, under a heavier rule */
 .why .basics tr:first-child > *{ border-top:2px solid var(--line); }
-.why .basics td{ font-size:.88rem; }
+.why .basics td{ font-size:.86rem; }
 .mk{ display:inline-flex; align-items:center; gap:7px; font-weight:700; font-size:.86rem; line-height:1.25; }
 .mk i{ flex:none; width:.6875rem; height:.6875rem; border-radius:50%; border:2px solid var(--c); }
 .mk.yes{ --c:var(--ok); } .mk.yes i{ background:var(--c); }
 .mk.partial{ --c:var(--wait); } .mk.partial i{ background:linear-gradient(90deg, var(--c) 50%, transparent 50%); }
 .mk.no{ --c:var(--muted); }
 .mk.nd{ --c:var(--muted); color:var(--muted); } .mk.nd i{ border-style:dotted; }
-.why .q{ display:block; margin:3px 0 0 18px; font-size:.8rem; color:var(--muted); white-space:nowrap; }
+.why .q{ display:block; margin:3px 0 0 18px; font-size:.8rem; color:var(--muted); }
 .why .checked{ margin:0; max-width:58rem; color:var(--muted); font-size:.86rem; line-height:1.5; }
-/* a phone: smaller type and tighter cells, so the four columns fit; a mark's words wrap beside its shape */
+/* a phone: smaller type, tighter cells and narrower columns, so the held columns and a whole tool show at once; a
+   mark's words wrap beside its shape */
 @media (max-width:600px){
-  .why table{ font-size:.84rem; }
-  .why col{ width:calc(70% / 3); }
-  .why col.feat{ width:30%; }
+  .why table{ font-size:.84rem; --pr:8px; }
   .why th, .why td{ padding:9px 6px; }
-  .why tr > :first-child{ padding-left:10px; }
-  .why tr > :last-child{ padding-right:8px; }
+  .why th.stick{ padding-left:10px; }
   .why thead th{ font-size:.84rem; }
+  .why .cw{ min-width:5.25rem; }
+  .why .fw{ width:6.5rem; }
   .why .basics td{ font-size:.8rem; }
   .mk{ align-items:flex-start; gap:5px; font-size:.8rem; }
   .mk i{ margin-top:.12em; width:.625rem; height:.625rem; }
   .why .q{ margin-left:0; font-size:.76rem; }
 }
-/* a small phone: smaller heads and tighter cells still */
+/* a small phone: smaller heads, tighter cells and narrower columns still, so from 320 px a whole tool shows beside the
+   held columns */
 @media (max-width:359px){
+  .why table{ --pr:6px; }
   .why th, .why td{ padding-inline:5px; }
-  .why tr > :first-child{ padding-left:8px; }
-  .why tr > :last-child{ padding-right:6px; }
+  .why th.stick{ padding-left:8px; }
   .why thead th{ font-size:.78rem; }
+  .why .cw{ min-width:5rem; }
+  .why .fw{ width:5.5rem; }
 }
 @media (prefers-reduced-motion: reduce){ .mx::after{ transition:none; } }
 
@@ -257,10 +278,10 @@ iframe{ flex:1; border:0; width:100%; background:var(--bg); }
 </head>
 <body>
 <div class="bar">
-  <span class="brand mark"><img src="img/icon-64.png" width="32" height="32" alt=""><span class="word">Agentboard</span></span>
+  <span class="brand mark"><img src="img/icon-64.png" width="32" height="32" alt=""><span class="word">AgentBoard</span></span>
   <nav class="tabs" aria-label="Documentation">
     <a class="tab" id="t-guide" href="#guide/latest" data-tab="guide">Guide</a>
-    <a class="tab" id="t-why" href="#why" data-tab="why">Why<span class="long"> Agentboard</span></a>
+    <a class="tab" id="t-why" href="#why" data-tab="why">Why<span class="long"> AgentBoard</span></a>
     <a class="tab" id="t-whatsnew" href="#whatsnew" data-tab="whatsnew">What’s new</a>
   </nav>
   <label class="pick" id="vpick"><span class="note">Version</span><select id="version" aria-label="Guide version"><option value="2.7">2.7 · latest</option><option value="2.6">2.6</option><optgroup label="Earlier: release notes"><option value="notes:2.5">2.5</option><option value="notes:2.4">2.4</option><option value="notes:2.3">2.3</option><option value="notes:2.2">2.2</option><option value="notes:2.1">2.1</option><option value="notes:2.0">2.0</option></optgroup></select></label>
@@ -268,24 +289,24 @@ iframe{ flex:1; border:0; width:100%; background:var(--bg); }
 </div>
 <p class="older" id="older" hidden>This is the guide for <span id="older-v"></span>. <a href="#guide/latest">The latest is 2.7 →</a></p>
 <main>
-  <div id="p-guide" class="framewrap"><iframe id="frame" title="Agentboard guide"></iframe></div>
+  <div id="p-guide" class="framewrap"><iframe id="frame" title="AgentBoard guide"></iframe></div>
   <div id="p-why" class="read" hidden>
 <div class="col why">
-<h1>Why Agentboard?</h1>
+<h1>Why AgentBoard?</h1>
 <ul class="key" aria-label="The marks"><li><span class="mk yes"><i></i>Yes</span></li><li><span class="mk partial"><i></i>Partly</span></li><li><span class="mk no"><i></i>No</span></li><li><span class="mk nd"><i></i>Not in its docs</span>: its own site and docs don’t describe it</li></ul>
-<p class="hint" id="why-hint" hidden>Scroll the table sideways for Pixel Agents and Crew <span aria-hidden="true">→</span></p>
+<p class="hint" id="why-hint" hidden>Scroll the table sideways for more tools <span aria-hidden="true">→</span></p>
 <div class="mx" id="why-mx"><div class="tw">
-<table><caption id="why-cap" class="vh">Agentboard, Pixel Agents and Crew, feature by feature</caption><colgroup><col class="feat"><col><col><col></colgroup><thead><tr><th scope="col" class="stick"><span class="vh">Feature</span></th><th scope="col" class="ours">Agentboard</th><th scope="col">Pixel Agents</th><th scope="col">Crew</th></tr></thead>
-<tbody><tr><th scope="row" class="stick">Messages between sessions</th><td class="ours"><span class="mk yes"><i></i>Yes</span></td><td><span class="mk partial"><i></i>Partly</span></td><td><span class="mk nd"><i></i>Not in its docs</span></td></tr><tr><th scope="row" class="stick">Decisions, claims, merge queue</th><td class="ours"><span class="mk yes"><i></i>Yes</span></td><td><span class="mk no"><i></i>No</span></td><td><span class="mk nd"><i></i>Not in its docs</span></td></tr><tr><th scope="row" class="stick">Shared plans</th><td class="ours"><span class="mk yes"><i></i>Yes</span></td><td><span class="mk no"><i></i>No</span></td><td><span class="mk nd"><i></i>Not in its docs</span></td></tr><tr><th scope="row" class="stick">Subagents and workflow runs</th><td class="ours"><span class="mk yes"><i></i>Yes</span></td><td><span class="mk partial"><i></i>Partly</span></td><td><span class="mk partial"><i></i>Partly</span></td></tr><tr><th scope="row" class="stick">Done tells the session to check</th><td class="ours"><span class="mk yes"><i></i>Yes</span></td><td><span class="mk no"><i></i>No</span></td><td><span class="mk nd"><i></i>Not in its docs</span></td></tr><tr><th scope="row" class="stick">History and search</th><td class="ours"><span class="mk yes"><i></i>Yes</span></td><td><span class="mk no"><i></i>No</span></td><td><span class="mk nd"><i></i>Not in its docs</span></td></tr><tr><th scope="row" class="stick">Warning before Claude Code deletes a session</th><td class="ours"><span class="mk yes"><i></i>Yes</span></td><td><span class="mk no"><i></i>No</span></td><td><span class="mk nd"><i></i>Not in its docs</span></td></tr><tr><th scope="row" class="stick">Jump to a session, approve prompts</th><td class="ours"><span class="mk no"><i></i>No</span></td><td><span class="mk partial"><i></i>Partly</span></td><td><span class="mk yes"><i></i>Yes</span><span class="q"><span class="vh">, </span>Pro (Mac)</span></td></tr></tbody>
-<tbody class="basics"><tr><th scope="row" class="stick">Coding agents</th><td class="ours">Claude Code</td><td>Claude Code</td><td>Claude Code, GitHub Copilot CLI, Cursor</td></tr><tr><th scope="row" class="stick">Where it runs</th><td class="ours">Mac with Apple silicon</td><td>VS Code or a browser; Windows, macOS, Linux</td><td>Mac and Windows</td></tr><tr><th scope="row" class="stick">Price</th><td class="ours">Free for one folder; Pro is coming</td><td>Free and open source (MIT)</td><td>Free; Pro $12 once on Mac</td></tr></tbody>
+<table><caption id="why-cap" class="vh">AgentBoard, Pixel Agents, Crew, Notchi and Vibe Notch, feature by feature</caption><colgroup><col class="feat"><col><col><col><col><col></colgroup><thead><tr><th scope="col" class="stick"><span class="vh">Feature</span><span class="fw"></span></th><th scope="col" class="ours"><span class="cw">AgentBoard</span></th><th scope="col"><span class="cw">Pixel Agents</span></th><th scope="col"><span class="cw">Crew</span></th><th scope="col"><span class="cw">Notchi</span></th><th scope="col"><span class="cw">Vibe Notch</span></th></tr></thead>
+<tbody><tr><th scope="row" class="stick">Messages between sessions</th><td class="ours"><span class="mk yes"><i></i>Yes</span></td><td><span class="mk partial"><i></i>Partly</span></td><td><span class="mk nd"><i></i>Not in its docs</span></td><td><span class="mk no"><i></i>No</span></td><td><span class="mk no"><i></i>No</span></td></tr><tr><th scope="row" class="stick">Shared decisions, plans, merge queue</th><td class="ours"><span class="mk yes"><i></i>Yes</span></td><td><span class="mk no"><i></i>No</span></td><td><span class="mk nd"><i></i>Not in its docs</span></td><td><span class="mk no"><i></i>No</span></td><td><span class="mk no"><i></i>No</span></td></tr><tr><th scope="row" class="stick">Subagents and workflow runs</th><td class="ours"><span class="mk yes"><i></i>Yes</span></td><td><span class="mk partial"><i></i>Partly</span></td><td><span class="mk partial"><i></i>Partly</span></td><td><span class="mk no"><i></i>No</span></td><td><span class="mk partial"><i></i>Partly</span></td></tr><tr><th scope="row" class="stick">Done tells the session to check</th><td class="ours"><span class="mk yes"><i></i>Yes</span></td><td><span class="mk no"><i></i>No</span></td><td><span class="mk nd"><i></i>Not in its docs</span></td><td><span class="mk no"><i></i>No</span></td><td><span class="mk no"><i></i>No</span></td></tr><tr><th scope="row" class="stick">History and search</th><td class="ours"><span class="mk yes"><i></i>Yes</span></td><td><span class="mk no"><i></i>No</span></td><td><span class="mk nd"><i></i>Not in its docs</span></td><td><span class="mk partial"><i></i>Partly</span></td><td><span class="mk partial"><i></i>Partly</span></td></tr><tr><th scope="row" class="stick">Warning before Claude Code deletes a session</th><td class="ours"><span class="mk yes"><i></i>Yes</span></td><td><span class="mk no"><i></i>No</span></td><td><span class="mk nd"><i></i>Not in its docs</span></td><td><span class="mk no"><i></i>No</span></td><td><span class="mk no"><i></i>No</span></td></tr><tr><th scope="row" class="stick">Jump to a session, approve prompts</th><td class="ours"><span class="mk yes"><i></i>Yes</span><span class="q"><span class="vh">, </span>Pro</span></td><td><span class="mk partial"><i></i>Partly</span></td><td><span class="mk yes"><i></i>Yes</span><span class="q"><span class="vh">, </span>Pro (Mac)</span></td><td><span class="mk yes"><i></i>Yes</span></td><td><span class="mk partial"><i></i>Partly</span></td></tr><tr><th scope="row" class="stick">In view over other windows</th><td class="ours"><span class="mk yes"><i></i>Yes</span></td><td><span class="mk no"><i></i>No</span></td><td><span class="mk yes"><i></i>Yes</span></td><td><span class="mk yes"><i></i>Yes</span></td><td><span class="mk yes"><i></i>Yes</span></td></tr></tbody>
+<tbody class="basics"><tr><th scope="row" class="stick">Coding agents</th><td class="ours">Claude Code</td><td>Claude Code</td><td>Claude Code, GitHub Copilot CLI, Cursor</td><td>Claude Code and Codex</td><td>Claude Code</td></tr><tr><th scope="row" class="stick">Where it runs</th><td class="ours">Main display, above the Dock; Apple silicon</td><td>VS Code or a browser; Windows, macOS, Linux</td><td>Bottom of the screen; Mac and Windows</td><td>MacBook notch; macOS 15+</td><td>MacBook notch; macOS 15.6+</td></tr><tr><th scope="row" class="stick">Price</th><td class="ours">Free for one folder; Pro is coming</td><td>Free and open source (MIT)</td><td>Free; Pro $12 once on Mac</td><td>Free and open source (GPL‑3.0)</td><td>Free and open source (Apache 2.0)</td></tr></tbody>
 </table></div></div>
-<p class="checked">Checked 13 October 2026, from each tool’s own site and docs: <a href="#guide/2.7">Agentboard 2.7.0</a>, <a href="https://github.com/pixel-agents-hq/pixel-agents/tree/v1.4.1" target="_blank" rel="noopener">Pixel Agents 1.4.1</a> and <a href="https://crew-deskmates.vercel.app/crew/" target="_blank" rel="noopener">Crew 2.5</a>.</p>
+<p class="checked">Checked from each tool’s own site, docs and code. On 26 October 2026: <a href="#guide/2.7">AgentBoard 2.7.3</a>. On 13 October 2026, and the In view row on 14 October: <a href="https://github.com/pixel-agents-hq/pixel-agents/tree/v1.4.1" target="_blank" rel="noopener">Pixel Agents 1.4.1</a> and <a href="https://crew-deskmates.vercel.app/crew/" target="_blank" rel="noopener">Crew 2.5</a>. On 14 October 2026: <a href="https://github.com/sk-ruban/notchi/tree/v1.2.7" target="_blank" rel="noopener">Notchi 1.2.7</a> and <a href="https://github.com/farouqaldori/vibe-notch/releases/tag/v1.3.2" target="_blank" rel="noopener">Vibe Notch 1.3.2</a> (previously Claude Island).</p>
 </div>
   </div>
   <div id="p-whatsnew" class="read" hidden>
 <div class="col wn" data-show="all">
 <header class="wn-head"><h1>What’s new</h1><p>Every release, newest first, its changes marked new, improved or fixed. A change you can see comes with a picture, drawn by that release’s own code.</p><div class="show" role="group" aria-label="Show changes"><button type="button" data-show="all" aria-pressed="true">All</button><button type="button" data-show="new" aria-pressed="false"><i class="t-new"></i>New</button><button type="button" data-show="improved" aria-pressed="false"><i class="t-improved"></i>Improved</button><button type="button" data-show="fixed" aria-pressed="false"><i class="t-fixed"></i>Fixed</button></div></header>
-<section class="minor" id="g2.7" data-minor="2.7" data-types="new improved fixed"><h2>2.7</h2><article class="rel k-feature" id="v2.7.0" data-types="new improved fixed"><header><span class="ver">2.7.0</span><h3>Rooms</h3><span class="kind t-new">Feature</span><span class="date">13 Oct 2026</span></header><div class="pic" data-type="new"><div class="vis pair stacked"><figure class="art"><figcaption>Before · 2.6.4</figcaption><div class="pxbox"><img class="px" src="img/whatsnew/2.7.0-before.png" width="512" height="100" style="--aw:256;--mx:4" loading="lazy" decoding="async" alt="Before, in 2.6.4: DOCS, which is on no board, sent FRONTEND one message and got a desk beside BACKEND and FRONTEND, as if it were on their board."></div></figure><figure class="art"><figcaption>After · 2.7.0</figcaption><div class="pxbox"><img class="px" src="img/whatsnew/2.7.0-after.png" width="512" height="100" style="--aw:256;--mx:4" loading="lazy" decoding="async" alt="After, in 2.7.0: BACKEND and FRONTEND keep their desks by the claims board. DOCS has no desk here and stands facing FRONTEND with a visitor badge; the DOCS door on the left leads to its own room. Each desk now has a small red phone."></div></figure></div><p class="cap"><span class="tag t-new">New</span> Rooms replace crews. Sessions visit other rooms as guests, by message or by desk phone.</p></div><div class="grp" data-type="new"><h4 class="t-new">New</h4><ul><li>Several boards per folder, joined only by <code>/agentboard</code> or Settings; plans show in a Plans tab.</li><li>A free look, Áo cờ, after Việt Nam&#x27;s flag, is the default and the app icon&#x27;s.</li></ul></div><div class="grp" data-type="improved"><h4 class="t-improved">Improved</h4><ul><li>In Needs you, Done replaces Dismiss for hand-backs and PRs, and tells their session to check.</li><li>Settings opens from the top bar; tick its session hooks again. The macOS notification is gone.</li></ul></div><div class="grp" data-type="fixed"><h4 class="t-fixed">Fixed</h4><ul><li>A workflow board kept its last run for good, all green even if it failed; now it says FAILED or STOPPED, and clears after ten minutes.</li></ul></div></article></section>
+<section class="minor" id="g2.7" data-minor="2.7" data-types="new improved fixed"><h2>2.7</h2><article class="rel k-feature" id="v2.7.3" data-types="new improved fixed"><header><span class="ver">2.7.3</span><h3>Find anything</h3><span class="kind t-new">Feature</span><span class="date">26 Oct 2026</span></header><div class="pic" data-type="new"><div class="vis pair stacked"><figure class="art"><figcaption>Before · 2.7.2</figcaption><div class="pxbox"><img class="px" src="img/whatsnew/2.7.3-before.png" width="396" height="100" style="--aw:198;--mx:4" loading="lazy" decoding="async" alt="Before, in 2.7.2: BACKEND, FRONTEND and DOCS at their desks by the claims board, each in the plain shirt of its desk, blue, orange and pink, all with the same skin tone."></div></figure><figure class="art"><figcaption>After · 2.7.3</figcaption><div class="pxbox"><img class="px" src="img/whatsnew/2.7.3-after.png" width="396" height="100" style="--aw:198;--mx:4" loading="lazy" decoding="async" alt="After, in 2.7.3: the same three, each dressed in a look of its own. BACKEND has brown skin and wears headphones with a charcoal hoodie, FRONTEND has light skin and wears a plum áo dài with a gold khăn vấn, and DOCS has tan skin and wears a nón lá with a brown áo bà ba. Their cards on the claims board take the colours of their new looks."></div></figure></div><p class="cap"><span class="tag t-new">New</span> With Pro, dress any session in any look, from the strip or Settings.</p></div><div class="grp" data-type="new"><h4 class="t-new">New</h4><ul><li>Search looks in every tab and groups what it finds, with a count for each.</li><li>Turn on the update check, and a dot on the menu-bar icon shows a new version.</li><li>Hide from screen sharing keeps the strip on your screen but out of most shares.</li></ul></div><div class="grp" data-type="improved"><h4 class="t-improved">Improved</h4><ul><li>Plans fold: only the one that changed last opens, the rest are one line each.</li><li>Settings comes in two parts: Workspaces and sessions, and App.</li><li>Settings › Characters works from the keyboard, and VoiceOver reads each look by name.</li></ul></div><div class="grp" data-type="fixed"><h4 class="t-fixed">Fixed</h4><ul><li>Holding ⌥ to move the strip brought AgentBoard forward and could switch desktops; now you stay where you are.</li><li>With several terminal windows open, Jump could pick the wrong one; now it brings the session&#x27;s own window forward.</li><li>Change look on a character&#x27;s card closed before you could reach it; now the card stays open on the way up.</li><li>The strip missed changes made while AgentBoard&#x27;s server restarted, such as Pro turned on; now it catches up when it reconnects.</li><li>A session moved to another desk kept its old shirt until the strip reloaded; now it changes at once.</li></ul></div></article><article class="rel k-feature" id="v2.7.2" data-types="new fixed"><header><span class="ver">2.7.2</span><h3>Within reach</h3><span class="kind t-new">Feature</span><span class="date">15 Oct 2026</span></header><div class="grp" data-type="new"><h4 class="t-new">New</h4><ul><li>Permission prompts show in Needs you, word for word; with Pro, Allow or Deny them there.</li><li>With Pro, Jump brings a session&#x27;s terminal tab, tmux pane or app to the front.</li><li>The strip comes in four sizes, 50% to 150%, on every plan.</li><li>With Pro, hold ⌥ and drag the strip to any display; it stays there.</li></ul></div><div class="grp" data-type="fixed"><h4 class="t-fixed">Fixed</h4><ul><li>Bots a usage limit cut off lay on the floor all day; now they get up at your next prompt to their session.</li></ul></div></article><article class="rel k-improvement" id="v2.7.1" data-types="improved"><header><span class="ver">2.7.1</span><span class="kind t-improved">Improvement</span><span class="date">14 Oct 2026</span></header><div class="grp" data-type="improved"><ul><li>The name is now AgentBoard, capital B, in the app, its menus and the docs.</li><li>AgentBoard.app replaces Agentboard.app when you drag it to Applications; the command and your boards stay.</li></ul></div></article><article class="rel k-feature" id="v2.7.0" data-types="new improved fixed"><header><span class="ver">2.7.0</span><h3>Rooms</h3><span class="kind t-new">Feature</span><span class="date">13 Oct 2026</span></header><div class="pic" data-type="new"><div class="vis pair stacked"><figure class="art"><figcaption>Before · 2.6.4</figcaption><div class="pxbox"><img class="px" src="img/whatsnew/2.7.0-before.png" width="512" height="100" style="--aw:256;--mx:4" loading="lazy" decoding="async" alt="Before, in 2.6.4: DOCS, which is on no board, sent FRONTEND one message and got a desk beside BACKEND and FRONTEND, as if it were on their board."></div></figure><figure class="art"><figcaption>After · 2.7.0</figcaption><div class="pxbox"><img class="px" src="img/whatsnew/2.7.0-after.png" width="512" height="100" style="--aw:256;--mx:4" loading="lazy" decoding="async" alt="After, in 2.7.0: BACKEND and FRONTEND keep their desks by the claims board. DOCS has no desk here and stands facing FRONTEND with a visitor badge; the DOCS door on the left leads to its own room. Each desk now has a small red phone."></div></figure></div><p class="cap"><span class="tag t-new">New</span> Rooms replace crews. Sessions visit other rooms as guests, by message or by desk phone.</p></div><div class="grp" data-type="new"><h4 class="t-new">New</h4><ul><li>Several boards per folder, joined only by <code>/agentboard</code> or Settings; plans show in a Plans tab.</li><li>A free look, Áo cờ, after Việt Nam&#x27;s flag, is the default and the app icon&#x27;s.</li></ul></div><div class="grp" data-type="improved"><h4 class="t-improved">Improved</h4><ul><li>In Needs you, Done replaces Dismiss for hand-backs and PRs, and tells their session to check.</li><li>Settings opens from the top bar; tick its session hooks again. The macOS notification is gone.</li></ul></div><div class="grp" data-type="fixed"><h4 class="t-fixed">Fixed</h4><ul><li>A workflow board kept its last run for good, all green even if it failed; now it says FAILED or STOPPED, and clears after ten minutes.</li></ul></div></article></section>
 <section class="minor" id="g2.6" data-minor="2.6" data-types="new improved fixed"><h2>2.6</h2><article class="rel k-fix" id="v2.6.4" data-types="fixed"><header><span class="ver">2.6.4</span><span class="kind t-fixed">Bug fix</span><span class="date">13 Oct 2026</span></header><div class="grp" data-type="fixed"><ul><li>A forked agent never showed on the strip; now it gets its bot beside its session from when it started.</li><li>A workflow&#x27;s agents left its board while working through a long step; now each stays there until it returns.</li><li>Hide on a restarted session hid only its first transcript; now Settings lists each one, and hiding the session hides them all.</li><li>A shade behind the strip read as a dirty band over light windows, and rounded corners cut off its floor; both are gone.</li><li>A lit screen&#x27;s middle line ran onto the monitor&#x27;s frame; now it stays on the screen.</li></ul></div></article><article class="rel k-fix" id="v2.6.3" data-types="fixed"><header><span class="ver">2.6.3</span><span class="kind t-fixed">Bug fix</span><span class="date">12 Oct 2026</span></header><div class="grp" data-type="fixed"><ul><li>Walking into a crew replayed its last few events, your prompts included, as if new; now only new events play.</li></ul></div></article><article class="rel k-fix" id="v2.6.2" data-types="fixed"><header><span class="ver">2.6.2</span><span class="kind t-fixed">Bug fix</span><span class="date">12 Oct 2026</span></header><div class="grp" data-type="fixed"><ul><li>The strip redrew 60 or 120 times a second even when nothing moved; now it draws 15 while moving and 4 when still, saving battery.</li></ul></div></article><article class="rel k-feature" id="v2.6.1" data-types="new fixed"><header><span class="ver">2.6.1</span><h3>Agents at work</h3><span class="kind t-new">Feature</span><span class="date">12 Oct 2026</span></header><div class="pic" data-type="new"><div class="vis pair stacked"><figure class="art"><figcaption>Before · 2.6.0</figcaption><div class="pxbox"><img class="px" src="img/whatsnew/2.6.1-before.png" width="328" height="100" style="--aw:164;--mx:4" loading="lazy" decoding="async" alt="Before, in 2.6.0: BACKEND runs a workflow with two pale helper bots beside it. FRONTEND has two background agents at work, yet stands alone."></div></figure><figure class="art"><figcaption>After · 2.6.1</figcaption><div class="pxbox"><img class="px" src="img/whatsnew/2.6.1-after.png" width="328" height="100" style="--aw:164;--mx:4" loading="lazy" decoding="async" alt="After, in 2.6.1: two dark bots with gold eyes stand beside FRONTEND, one for each background agent, while BACKEND&#x27;s workflow bots stay pale."></div></figure></div><p class="cap"><span class="tag t-new">New</span> Background agents get a bot of their own: dark, with gold eyes; workflow bots stay pale.</p></div><div class="grp" data-type="new"><h4 class="t-new">New</h4><ul><li>Hover a session to see its workflows, each with its phase, and its agents.</li><li>An agent that failed lies beside its session for a day.</li></ul></div><div class="grp" data-type="fixed"><h4 class="t-fixed">Fixed</h4><ul><li>A session&#x27;s background agents only popped up as they started, so it looked idle; now they stay beside it while they work.</li></ul></div></article><article class="rel k-feature" id="v2.6.0" data-types="new improved fixed"><header><span class="ver">2.6.0</span><h3>Every run on the board</h3><span class="kind t-new">Feature</span><span class="date">12 Oct 2026</span></header><div class="pic" data-type="new"><div class="vis pair stacked"><figure class="art"><figcaption>Before · 2.5.0</figcaption><div class="pxbox"><img class="px" src="img/whatsnew/2.6.0-before.png" width="372" height="100" style="--aw:186;--mx:3" loading="lazy" decoding="async" alt="Before, in 2.5.0: PAYMENTS works alone and runs two workflows, but one wide board titled WORKFLOW shows only the newest, with two agents under Build."></div></figure><figure class="art"><figcaption>After · 2.6.0</figcaption><div class="pxbox"><img class="px" src="img/whatsnew/2.6.0-after.png" width="372" height="100" style="--aw:186;--mx:3" loading="lazy" decoding="async" alt="After, in 2.6.0: a board for each workflow, FIXTURE-AUDIT and LEDGER-READS. FIXTURE-AUDIT was cut off: its Fix phase is red and its two agents lie under it."></div></figure></div><p class="cap"><span class="tag t-new">New</span> A session working alone gets a board per workflow; cut-off runs stay red, agents lying down.</p></div><div class="grp" data-type="improved"><h4 class="t-improved">Improved</h4><ul><li>Deletion warnings say nothing is deleted until your first Claude Code prompt after the date.</li></ul></div><div class="grp" data-type="fixed"><h4 class="t-fixed">Fixed</h4><ul><li>A workflow cut off partway, such as by a usage limit, looked finished; now the Workflows tab says where its agents stopped and why.</li><li>Merged PRs stayed in Needs you; now they clear once the merge queue marks them merged or closed, and each PR is listed once.</li><li>Prompts typed while a session was busy showed up late, and those with an image never did; now each shows when you sent it.</li><li>The strip could replay an answer you gave long ago, or a renamed session&#x27;s old events, as if new; now only recent ones play.</li></ul></div></article></section>
 <section class="minor" id="g2.5" data-minor="2.5" data-types="new fixed"><h2>2.5</h2><article class="rel k-feature" id="v2.5.0" data-types="new fixed"><header><span class="ver">2.5.0</span><h3>The wardrobe</h3><span class="kind t-new">Feature</span><span class="date">11 Oct 2026</span></header><div class="pic" data-type="new"><div class="vis pair"><figure><figcaption>Before · 2.4.0</figcaption><img class="shot" src="img/whatsnew/2.5.0-before.png" width="912" height="377" style="--w:912px" loading="lazy" decoding="async" alt="Before, in 2.4.0: Settings, Your character, with eight looks facing forward, mostly hoodie colours: Green hoodie, Headphones, Night shift, Plum, Lagoon, Oatmeal, Plum headphones and Beanie."></figure><figure><figcaption>After · 2.5.0</figcaption><img class="shot" src="img/whatsnew/2.5.0-after.png" width="912" height="377" style="--w:912px" loading="lazy" decoding="async" alt="After, in 2.5.0: ten looks with side-view faces, each with an info button: Green hoodie, Headphones, Beanie, Nón lá, Áo dài, Cà phê, Dao Đỏ, H&#x27;Mông Hoa, Thái Đen and Ê Đê."></figure></div><p class="cap"><span class="tag t-new">New</span> Ten looks to wear at the gate, each with its story; faces now in profile.</p></div><div class="grp" data-type="fixed"><h4 class="t-fixed">Fixed</h4><ul><li>Placeholders like <code>[Image #1]</code> in your prompts were taken for PRs, and session names for tickets; they no longer are.</li><li>Clicking the workflow board of a session working alone opened Decisions; now it opens Workflows, and hovering shows the run.</li></ul></div></article></section>
 <section class="minor" id="g2.4" data-minor="2.4" data-types="new improved fixed"><h2>2.4</h2><article class="rel k-feature" id="v2.4.0" data-types="new improved fixed"><header><span class="ver">2.4.0</span><h3>Watching a crew</h3><span class="kind t-new">Feature</span><span class="date">11 Oct 2026</span></header><div class="pic" data-type="improved"><div class="vis pair stacked"><figure class="art"><figcaption>Before · 2.3.0</figcaption><div class="pxbox"><img class="px" src="img/whatsnew/2.4.0-before.png" width="368" height="100" style="--aw:184;--mx:3" loading="lazy" decoding="async" alt="Before, in 2.3.0: three characters, FOR, ONBOARDING and ONBOARDIN-2. A session titled &#x27;Search index for v3&#x27; is named after the word &#x27;for&#x27;, and a restarted session gets a desk of its own."></div></figure><figure class="art"><figcaption>After · 2.4.0</figcaption><div class="pxbox"><img class="px" src="img/whatsnew/2.4.0-after.png" width="368" height="100" style="--aw:184;--mx:3" loading="lazy" decoding="async" alt="After, in 2.4.0: two characters, INDEX and ONBOARDING; the restarted session is one character, at work."></div></figure></div><p class="cap"><span class="tag t-improved">Improved</span> One character per session, at the same desk all day, named from its title&#x27;s key word.</p></div><div class="grp" data-type="new"><h4 class="t-new">New</h4><ul><li>Take a session off a crew with Leave in Settings, or <code>agentboard leave</code> inside it.</li></ul></div><div class="grp" data-type="improved"><h4 class="t-improved">Improved</h4><ul><li>Needs you lists each thing once, in the order the actions must happen.</li></ul></div><div class="grp" data-type="fixed"><h4 class="t-fixed">Fixed</h4><ul><li>Things a board&#x27;s sessions handed back to you vanished from Needs you whenever Agentboard restarted; now they stay until done.</li><li>Decisions logged with impossible times, such as hours ahead, showed out of order; now they&#x27;re placed by when they were written.</li></ul></div></article></section>
@@ -293,7 +314,7 @@ iframe{ flex:1; border:0; width:100%; background:var(--bg); }
 <section class="minor" id="g2.2" data-minor="2.2" data-types="new improved fixed"><h2>2.2</h2><article class="rel k-feature" id="v2.2.0" data-types="new improved fixed"><header><span class="ver">2.2.0</span><h3>Free and Pro</h3><span class="kind t-new">Feature</span><span class="date">11 Oct 2026</span></header><div class="pic" data-type="new"><div class="vis pair stacked"><figure class="art"><figcaption>Before · 2.1.0</figcaption><div class="pxbox"><img class="px" src="img/whatsnew/2.2.0-before.png" width="486" height="100" style="--aw:243;--mx:3" loading="lazy" decoding="async" alt="Before, in 2.1.0: BACKEND is busy in Claude Code but sits at a dark screen, FRONTEND waits on you but looks idle, and YOU wears the green hoodie."></div></figure><figure class="art"><figcaption>After · 2.2.0</figcaption><div class="pxbox"><img class="px" src="img/whatsnew/2.2.0-after.png" width="486" height="100" style="--aw:243;--mx:3" loading="lazy" decoding="async" alt="After, in 2.2.0: BACKEND types at a lit screen, a question mark hangs over FRONTEND, and YOU wears headphones."></div></figure></div><p class="cap"><span class="tag t-new">New</span> See who is working and who waits on you, and pick your own look.</p></div><div class="grp" data-type="new"><h4 class="t-new">New</h4><ul><li>Needs you warns 7, 3 and 1 day before Claude Code deletes a session.</li><li>Pro, a one-time licence, adds every folder, all history, summaries, the usage clock, sounds and looks.</li><li>The free plan covers one folder and the last 7 days.</li></ul></div><div class="grp" data-type="improved"><h4 class="t-improved">Improved</h4><ul><li>A session renamed with <code>/rename</code> in Claude Code takes its new name on the strip.</li></ul></div><div class="grp" data-type="fixed"><h4 class="t-fixed">Fixed</h4><ul><li>PRs waiting to merge vanished from Needs you when the merge queue named their state in its own words; now they show.</li></ul></div></article></section>
 <section class="minor" id="g2.1" data-minor="2.1" data-types="new improved fixed"><h2>2.1</h2><article class="rel k-feature" id="v2.1.0" data-types="new improved fixed"><header><span class="ver">2.1.0</span><h3>Crews</h3><span class="kind t-new">Feature</span><span class="date">11 Oct 2026</span></header><div class="pic" data-type="new"><div class="vis pair stacked"><figure class="art"><figcaption>Before · 2.0.0</figcaption><div class="pxbox"><img class="px" src="img/whatsnew/2.1.0-before.png" width="568" height="100" style="--aw:284;--mx:3" loading="lazy" decoding="async" alt="Before, in 2.0.0: BACKEND, FRONTEND and DOCS all stand around one claims board, though DOCS works on its own."></div></figure><figure class="art"><figcaption>After · 2.1.0</figcaption><div class="pxbox"><img class="px" src="img/whatsnew/2.1.0-after.png" width="568" height="100" style="--aw:284;--mx:3" loading="lazy" decoding="async" alt="After, in 2.1.0: BACKEND and FRONTEND keep the strip and their board; DOCS has its own door on the left, beside WEB and INFRA."></div></figure></div><p class="cap"><span class="tag t-new">New</span> Sessions that work together share a strip; one working alone gets its own door.</p></div><div class="grp" data-type="new"><h4 class="t-new">New</h4><ul><li>Each crew has its own Conversation, Decisions and Needs you, so unrelated sessions no longer mix.</li><li>Several sessions without a board get an empty one; the panel offers to start it.</li></ul></div><div class="grp" data-type="improved"><h4 class="t-improved">Improved</h4><ul><li>Idle crews go under Earlier in the picker, with a door only when something waits there.</li></ul></div><div class="grp" data-type="fixed"><h4 class="t-fixed">Fixed</h4><ul><li>A strip opened before any workspace was added never showed one until reloaded; now it appears at once.</li></ul></div></article></section>
 <section class="minor" id="g2.0" data-minor="2.0" data-types="new improved fixed"><h2>2.0</h2><article class="rel k-feature" id="v2.0.0" data-types="new improved fixed"><header><span class="ver">2.0.0</span><h3>macOS app</h3><span class="kind t-new">Feature</span><span class="date">11 Oct 2026</span></header><div class="pic" data-type="new"><div class="vis"><figure><img class="px icon" src="img/whatsnew/2.0.0-after.png" width="256" height="256" style="--w:256px" loading="lazy" decoding="async" alt="The app icon: YOU in the green hoodie, standing on the floor, with a red count of what waits on you."></figure></div><p class="cap"><span class="tag t-new">New</span> Agentboard is a Mac app; its icon is you in the green hoodie, counting what waits.</p></div><div class="grp" data-type="new"><h4 class="t-new">New</h4><ul><li>Drag Agentboard to Applications; it runs on Apple silicon and lives in the menu bar.</li></ul></div><div class="grp" data-type="improved"><h4 class="t-improved">Improved</h4><ul><li>Everything comes inside the app, the command line too; link it onto your PATH.</li></ul></div><div class="grp" data-type="fixed"><h4 class="t-fixed">Fixed</h4><ul><li>A PR written like <code>web#12</code> was filed under the folder&#x27;s own repo; now it goes under <code>web</code>.</li></ul></div></article></section>
-<details class="before-app" id="g-before" data-types="new"><summary><span class="h">Before the app</span><span class="sub">0.1 to 1.4, before Agentboard was a Mac app</span></summary><ul class="lines">
+<details class="before-app" id="g-before" data-types="new"><summary><span class="h">Before the app</span><span class="sub">0.1 to 1.4, before AgentBoard was a Mac app</span></summary><ul class="lines">
 <li id="v1.4.0" data-minor="1.4"><span class="ver">1.4.0</span> <span class="date">11 Oct 2026</span> <b>npm package</b> <span class="cap">Installs from one package; the agentboard command opens the strip.</span></li>
 <li id="v1.3.0" data-minor="1.3"><span class="ver">1.3.0</span> <span class="date">11 Oct 2026</span> <b>Start a board</b> <span class="cap">Several sessions in one folder? One click puts a board between their desks.</span></li>
 <li id="v1.2.0" data-minor="1.2"><span class="ver">1.2.0</span> <span class="date">11 Oct 2026</span> <b>One session, the wall, sounds</b> <span class="cap">A session alone shows its workflow&#x27;s phases; the wall shows tokens and your limits.</span></li>
@@ -328,13 +349,13 @@ const tell = () => {
 };
 const quietly = (h) => { try { history.replaceState(null, '', '#' + h); } catch (e) {} };
 // each view names itself in the browser's tab, its bookmarks and its history
-const TITLES = { why: 'Why Agentboard?', whatsnew: 'What’s new · Agentboard' };
+const TITLES = { why: 'Why AgentBoard?', whatsnew: 'What’s new · AgentBoard' };
 function tab(t) {
   for (const a of document.querySelectorAll('.bar .tab')) {
     if (a.dataset.tab === t) a.setAttribute('aria-current', 'page');
     else a.removeAttribute('aria-current');
   }
-  document.title = TITLES[t] || 'Agentboard';
+  document.title = TITLES[t] || 'AgentBoard';
   document.getElementById('p-guide').hidden = t !== 'guide';
   news.hidden = t !== 'whatsnew';
   why.hidden = t !== 'why';
@@ -418,17 +439,23 @@ function show(t) {
   for (const b of wn.querySelectorAll('.show button')) b.setAttribute('aria-pressed', String(b.dataset.show === t));
 }
 for (const b of wn.querySelectorAll('.show button')) b.addEventListener('click', () => show(b.dataset.show));
-// Why Agentboard's matrix fits its column down to small phones. Where it cannot (a very narrow screen, or large text) it
+// Why AgentBoard's matrix fits its column on a laptop. Where it cannot (a phone, a narrow window, or large text) it
 // scrolls in its own box, with a hint above it and the edge with more to see shaded; only then is the box a stop for
 // the Tab key, named by the matrix's caption. The box is no taller than the view has room for once scrolled to its end,
-// so its head row never leaves the view. Sideways it comes to rest only where a tool's column starts beside the held
-// one; room after the last column lets the scroll reach such a place, so no sliver of a column shows.
-const mx = document.getElementById('why-mx'), tw = mx.querySelector('.tw'), matrix = tw.querySelector('table'), heads = matrix.tHead.rows[0].cells;
-const set = (style, k, v) => { if (style[k] !== v) style[k] = v; };
+// so its head never leaves the view. It holds the feature column, and AgentBoard's beside it wherever the widest other
+// tool's column still shows whole next to both, so each tool can be read against AgentBoard. Sideways it comes to rest
+// only where a tool's column starts beside the held ones; room after the last column lets the scroll reach such a
+// place, so no sliver of a column shows. The head is one row, the tools' names under no group head.
+const mx = document.getElementById('why-mx'), tw = mx.querySelector('.tw'), matrix = tw.querySelector('table');
+// a cell of each column, in order: the feature column, then a column per tool, AgentBoard's first
+const cols = matrix.tBodies[0].rows[0].cells;
+const set = (o, k, v) => { if (o[k] !== v) o[k] = v; };
+const prop = (style, k, v) => { if (style.getPropertyValue(k) !== v) { if (v) style.setProperty(k, v); else style.removeProperty(k); } };
 function fit() {
   if (why.hidden) return;
-  // the matrix's own width, without the room added after its last column
-  const added = parseFloat(matrix.style.borderRightWidth) || 0;
+  // the matrix's own width, and each column's, without the room added after its last column
+  const added = parseFloat(matrix.style.getPropertyValue('--end')) || 0;
+  const width = (i) => cols[i].getBoundingClientRect().width - (i === cols.length - 1 ? added : 0);
   const natural = matrix.getBoundingClientRect().width - added;
   const wide = natural > tw.clientWidth + 1;
   if (String(wide) !== mx.dataset.scroll) {
@@ -441,19 +468,28 @@ function fit() {
     const v = why.getBoundingClientRect(), b = tw.getBoundingClientRect();
     const below = why.scrollHeight - (b.bottom - v.top + why.scrollTop), edge = b.top - mx.getBoundingClientRect().top;
     set(tw.style, 'maxHeight', Math.max(240, Math.floor(why.clientHeight - below - edge)) + 'px');
-    // the first place, from the left, where a tool's column starts beside the held one at or past the scroll's end
-    const room = natural - tw.clientWidth, start = heads[1].getBoundingClientRect().left;
+    // AgentBoard's column held too, where the widest other tool's column still shows whole beside both
+    let widest = 0;
+    for (let i = 2; i < cols.length; i++) widest = Math.max(widest, width(i));
+    const hold = tw.clientWidth - width(0) - width(1) >= widest ? 2 : 1;
+    set(mx.dataset, 'hold', String(hold));
+    const held = width(0) + (hold === 2 ? width(1) : 0);
+    // the first place, from the left, where a tool's column starts beside the held ones at or past the scroll's end
+    const room = natural - tw.clientWidth, start = cols[hold].getBoundingClientRect().left;
     let add = 0;
-    for (let i = 1; i < heads.length - 1; i++) {
-      const at = heads[i].getBoundingClientRect().right - start;
+    for (let i = hold; i < cols.length - 1; i++) {
+      const at = cols[i].getBoundingClientRect().right - start;
       if (at >= room) { add = Math.ceil(at - room); break; }
     }
-    set(matrix.style, 'borderRight', add ? add + 'px solid transparent' : '');
-    set(tw.style, 'scrollPaddingLeft', heads[0].getBoundingClientRect().width + 'px');
+    prop(matrix.style, '--end', add ? add + 'px' : '');
+    set(tw.style, 'scrollPaddingLeft', held + 'px');
+    prop(matrix.style, '--feat', width(0) + 'px');
   } else {
     set(tw.style, 'maxHeight', '');
-    set(matrix.style, 'borderRight', '');
+    delete mx.dataset.hold;
+    prop(matrix.style, '--end', '');
     set(tw.style, 'scrollPaddingLeft', '');
+    prop(matrix.style, '--feat', '');
   }
   edges();
 }
